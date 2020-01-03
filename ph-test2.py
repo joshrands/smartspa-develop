@@ -84,9 +84,9 @@ while (img_name != "q"):
     print(red, green, blue)
 
     # classify the pH
-    dif_red = (max_red - red)
-    dif_green = (max_green - green)
-    dif_blue = (max_blue - blue)
+    dif_red = delta_red - (max_red - red)
+    dif_green = delta_green - (max_green - green)
+    dif_blue = delta_blue - (max_blue - blue)
     print("Diffs", dif_red, dif_green, dif_blue)
 
     delta_ph = dif_red * red_weight + dif_green * green_weight + dif_blue * blue_weight
