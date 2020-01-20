@@ -38,6 +38,7 @@ def getScaleMap(scale_name):
 	return scale
 
 import numpy as np
+
 def getDistanceBetweenPoints(x,y):
 	squared_dist = np.sum((np.array(x) - np.array(y))**2, axis=0)
 	dist = np.sqrt(squared_dist)
