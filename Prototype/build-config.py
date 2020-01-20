@@ -6,7 +6,7 @@ import os
 def buildConfig(scale_name):
 	directory = os.fsencode("config/" + scale_name)
 	out_file = open(scale_name + "-config.csv","w")
-	out_file.write(scale_name + "\n")
+#	out_file.write(scale_name + "\n")
 
 	for file in os.listdir(directory):
 		file_name = os.fsdecode(file)
@@ -23,6 +23,8 @@ def buildConfig(scale_name):
 
 		out_file.write(whole + "." + decimal + ",")
 		out_file.write("(" + str(r) + " " + str(g) + " " + str(b) + ")\n")
+	
+	out_file.close()
 
 # pH
 buildConfig("pH")
