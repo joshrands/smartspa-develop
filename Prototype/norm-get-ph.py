@@ -11,7 +11,7 @@ arg_vals = vars(args)
 
 vis = arg_vals['vis']
 
-file_name = "test-ph.png"#input("Enter file name: ")
+file_name = input("Enter file name: ")
 r,g,b = getRGBOfImage(file_name)
 #print(r,g,b)
 
@@ -42,6 +42,7 @@ ax.scatter(r_arr,g_arr,b_arr)
 ax.set_xlabel("Red")
 ax.set_ylabel("Green")
 ax.set_zlabel("Blue")
+ax.set_title("Raw RGB")
 
 if vis:	
 	pyplot.show()
@@ -51,9 +52,10 @@ g_range = max(g_arr) - min(g_arr)
 b_range = max(b_arr) - min(b_arr)
 
 # normalize input data
-r = (r - min(r_arr)) / r_range
-g = (g - min(g_arr)) / g_range
-b = (b - min(b_arr)) / b_range
+# UPDATE: NOT NORMALIZING
+#r = (r - min(r_arr)) / r_range
+#g = (g - min(g_arr)) / g_range
+#b = (b - min(b_arr)) / b_range
 
 # get distance from each point 
 closest = 255
@@ -61,9 +63,9 @@ closest_key = ""
 for key in scale:
 	rgb = scale[key]
 
-	rgb[0] = (rgb[0] - min(r_arr)) / r_range
-	rgb[1] = (rgb[1] - min(g_arr)) / g_range
-	rgb[2] = (rgb[2] - min(b_arr)) / b_range
+#	rgb[0] = (rgb[0] - min(r_arr)) / r_range
+#	rgb[1] = (rgb[1] - min(g_arr)) / g_range
+#	rgb[2] = (rgb[2] - min(b_arr)) / b_range
 
 	dist = getDistanceBetweenPoints(rgb, [r,g,b])
 	print(key + ": " + str(dist))
