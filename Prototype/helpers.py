@@ -8,8 +8,9 @@ import time
 from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
 
-def getRGBOfImage(image_path, vis=False):
-	num_deviations = 2
+def getRGBOfImage(image_path, vis=False, num_deviations=2):
+	if (num_deviations == None):
+		num_deviations = 2
 
 	img = cv2.imread(image_path)
 
