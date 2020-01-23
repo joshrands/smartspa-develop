@@ -3,6 +3,8 @@
 from helpers import *
 import os
 
+scale_name = input("Enter scale name: ")
+
 def buildConfig(scale_name):
 	directory = os.fsencode("config/" + scale_name)
 	out_file = open(scale_name + "-config.csv","w")
@@ -27,5 +29,5 @@ def buildConfig(scale_name):
 	out_file.close()
 
 # pH
-buildConfig("pH")
+buildConfig(scale_name)
 

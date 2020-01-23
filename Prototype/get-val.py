@@ -9,6 +9,7 @@ parser.add_argument("--vis", action='store_true', help="Visualize input")
 parser.add_argument("--rgb", action='store_true', help="Show rgb visualization")
 parser.add_argument("--std")
 parser.add_argument("--file")
+parser.add_argument("--scale")
 
 args = parser.parse_args()
 arg_vals = vars(args)
@@ -17,6 +18,7 @@ vis = arg_vals['vis']
 rgb_vis = arg_vals['rgb']
 std = arg_vals['std']
 file_name = arg_vals['file']
+scale = arg_vals['scale']
 
 if (file_name == None):
 	file_name = input("Enter file name: ")
@@ -26,7 +28,10 @@ if (std == None):
 r,g,b = getRGBOfImage(file_name, rgb_vis, int(std))
 #print(r,g,b)
 
-scale = getScaleMap("pH")
+if (scale == None):
+	scale = "pH"
+
+scale = getScaleMap(scale)
 #print(scale)
 
 s_r = []
