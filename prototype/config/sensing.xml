@@ -1,5 +1,6 @@
 <sensing>
 	<calibrate>true</calibrate>
-	<camera>0</camera>
+	<!--Image source can be file or camera-->
+	<image_source>file</image_source>
 	<std>2</std>
 </sensing>

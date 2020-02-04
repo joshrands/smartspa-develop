@@ -11,7 +11,10 @@ Email: joshrands1@gmail.com
 import logging as log
 import argparse
 from helpers import parse_xml
+import matplotlib.image as image
+import os
 
+from sensing import get_average_rgb_from_img
 
 # Global Variables
 main_config = None
@@ -85,6 +88,36 @@ def init(verbose):
 	init_ui()
 	init_db()
 
+
+def calibrate_chemical(chemical):
+	log.info("Calibrating %s" % chemical)
+
+	directory = os.fsencode("calibrate/" + chemical)
+	out_file = open("calibrate/" + chemical + "/cal.csv","w")
+
+	for file in os.listdir(directory):
+		file_name = os.fsdecode(file)
+		file_path = "calibrate/" + chemical + "/" + file_name
+
+		if file_path[-3:] != 'png':
+			continue
+
+		img = image.imread(file_path)
+		r,g,b = get_average_rgb_from_img(img)
+
+    # write to config file
+    # get pH 
+		nums = file_name.split(',')
+		whole = nums[0]
+		decimal = nums[1].split('.')[0]
+
+		out_file.write(whole + "." + decimal + ",")
+		out_file.write("(" + str(r) + " " + str(g) + " " + str(b) + ")\n")
+
+	out_file.close()
+
+	log.info("%s calibrated." % chemical)
+
 	
 def init_sensing():
 	"""Initialize the sensing subsystem.
@@ -96,6 +129,13 @@ def init_sensing():
 
 	sensing_config = Config("sensing")
 
+	if True == sensing_config.data['calibrate']:
+		log.info("Calibrating sensing scale...")
+		
+		calibrate_dir = os.fsencode("calibrate")
+		
+		for file in os.listdir(calibrate_dir):
+			calibrate_chemical(os.fsdecode(file))
 
 def init_dispensing():
 	"""Initialize the dispensing subsystem.

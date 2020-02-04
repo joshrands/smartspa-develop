@@ -12,6 +12,7 @@ Email: joshrands1@gmail.com
 import init
 import time
 import logging as log
+from control import balance_chemical
 #from sensing import get_error
 
 if __name__ == '__main__':
@@ -29,7 +30,7 @@ if __name__ == '__main__':
 		log.info("Checking system levels...")
 
 		if (True == init.main_config.data['pH']):
-			log.info("Checking pH level")
+			balance_chemical('pH', arg_vals['vis'])
 
 		# sleep for sample interval
 		time.sleep(sample_interval_s)
