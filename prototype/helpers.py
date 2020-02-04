@@ -8,7 +8,7 @@ Email: joshrands1@gmail.com
 
 import xml.etree.ElementTree as ET
 import logging as log
-
+import numpy as np
 
 def parse_xml(file_name):
 	"""Parse an xml file into a python dictionary
@@ -34,5 +34,14 @@ def parse_xml(file_name):
 		count += 1
 
 	return data
+
+
+def get_distance_between_points_3d(x, y):
+	"""Get the 3-dimensional distance between these two points
+	"""
+	squared_dist = np.sum((np.array(x) - np.array(y))**2, axis=0)
+	dist = np.sqrt(squared_dist)
+
+	return dist
 
 

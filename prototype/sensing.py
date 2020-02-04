@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import init
+from helpers import get_distance_between_points_3d
 
 def get_error(chemical, vis=False):
 	"""Get the error for a given chemical 
@@ -30,6 +31,19 @@ def get_error(chemical, vis=False):
 
 	if vis:
 		visualize([r,g,b], scale)
+
+	# get the distance from each point in the scale 
+	closest = 255
+	closest_key = ""
+	for key in scale:
+		rgb = scale[key]
+		dist = get_distance_between_points_3d(rgb, [r,g,b])
+
+		if dist < closest:
+			closest = dist
+			closest_key = key
+
+	print("Closest to: %s" % closest_key)
 
 
 def prepare_sample():
@@ -88,8 +102,6 @@ def get_average_rgb_from_img(img):
 	clean_g = g
 	clean_b = b
 	while outlier:
-		log.info("Cleaning input image...")
-
     # look at data of image
 		r_mean = np.mean(np.array(clean_r))
 		r_std = np.std(np.array(clean_r))
@@ -97,10 +109,6 @@ def get_average_rgb_from_img(img):
 		g_std = np.std(np.array(clean_g))
 		b_mean = np.mean(np.array(clean_b))
 		b_std = np.std(np.array(clean_b))
-
-#		log.info("Red: mu=" + str(r_mean) + ", sigma=" + str(r_std))
-#		log.info("Green: mu=" + str(g_mean) + ", sigma=" + str(g_std))
-#		log.info("Blue: mu=" + str(b_mean) + ", sigma=" + str(b_std))
 
 		outlier = False
 		new_r = []
@@ -126,9 +134,20 @@ def get_scale_map(chemical):
 	"""Return a dictionary of values to average rgb.
 	"""
 
-	log.warning("No scale.")
+	in_file = open("calibrate/" + chemical + "/cal.csv", 'r')
 
-	return {}
+	lines = in_file.readlines()
+
+	scale = {}
+	for line in lines:
+		split = line.split(',')
+		rgb = (split[1][1:-2].split(' '))
+		rgb[0] = float(rgb[0])
+		rgb[1] = float(rgb[1])
+		rgb[2] = float(rgb[2])
+		scale[split[0]] = rgb
+
+	return scale
 
 
 def visualize(rgb, scale):
