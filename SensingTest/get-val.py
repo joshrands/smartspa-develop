@@ -25,6 +25,8 @@ if (file_name == None):
 if (std == None):
 	std = 2
 
+file_name = "test/" + file_name
+
 r,g,b = getRGBOfImage(file_name, rgb_vis, int(std))
 #print(r,g,b)
 
