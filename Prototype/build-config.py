@@ -13,7 +13,7 @@ def buildConfig(scale_name):
 	for file in os.listdir(directory):
 		file_name = os.fsdecode(file)
 		file_path = "config/" + scale_name + "/" + file_name	
-		r,g,b = getRGBOfImage(file_path)
+		r,g,b = getRGBOfImage(file_path, True)
 
 		print(r,g,b)
 

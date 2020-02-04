@@ -56,13 +56,9 @@ if vis:
 
 	ax.scatter(s_r,s_g,s_b)
 
-#	ax.set_xlim(0,255)
-#	ax.set_ylim(0,255)
-#	ax.set_zlim(0,255)
 	ax.set_xlabel("Red")
 	ax.set_ylabel("Green")
 	ax.set_zlabel("Blue")
-	
 
 # check r,g,b ranges
 if r > max(s_r):

@@ -14,6 +14,10 @@ def getRGBOfImage(image_path, vis=False, num_deviations=2):
 
 	img = cv2.imread(image_path)
 
+	if vis:
+		cv2.imshow("Before", img)
+		cv2.waitKey(0)
+
 	total_blue = 0
 	total_green = 0
 	total_red = 0
@@ -86,6 +90,17 @@ def getRGBOfImage(image_path, vis=False, num_deviations=2):
 	r = r_mean
 	g = g_mean
 	b = b_mean
+
+	if vis:
+		for i in range(len(img)):
+			for j in range(len(img[i])):
+	#			print(img[i,j])
+				img[i,j][0] = b
+				img[i,j][1] = g
+				img[i,j][2] = r
+
+		cv2.imshow("After", img)
+		cv2.waitKey(0)
 
 	return r,g,b
 
