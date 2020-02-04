@@ -1,0 +1,4 @@
+<sensing>
+	<sample_interval_s>2</sample_interval_s>
+	<pH>true</pH>
+</sensing>

@@ -21,10 +21,15 @@ def parse_xml(file_name):
 	count = 0
 	for child in root:
 
-		if (root[count].text == 'true' or root[count].text == 'false'):
-			data[child.tag] = bool(root[count].text)	
+		if (root[count].text == 'true'):
+			data[child.tag] = True
+		elif (root[count].text == 'false'):
+			data[child.tag] = False 
+		elif (True == (root[count].text).isdigit()):
+			data[child.tag] = int(root[count].text)
 		else:	
 			data[child.tag] = root[count].text	
+
 	
 		count += 1
 

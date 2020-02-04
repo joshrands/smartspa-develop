@@ -1,0 +1,5 @@
+<sensing>
+	<calibrate>true</calibrate>
+	<camera>0</camera>
+	<std>2</std>
+</sensing>
