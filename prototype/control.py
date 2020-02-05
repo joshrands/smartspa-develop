@@ -1,4 +1,4 @@
-"""@package control
+"""@module control
 Pull together the sensing and dispensing to adjust chemical levels.
  
 Author: Josh Rands
@@ -16,4 +16,6 @@ def balance_chemical(chemical, vis=False):
 	log.info("Balancing %s" % chemical)
 
 	error = get_error(chemical, vis)
+
+	log.info("%s error = %0.4d" % (chemical, error))
 

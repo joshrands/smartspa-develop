@@ -1,4 +1,4 @@
-"""@package helpers
+"""@module helpers
 Python helper functions for performing tedious work.
  
 Author: Josh Rands

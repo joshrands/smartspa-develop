@@ -1,4 +1,4 @@
-"""@package main
+"""@module main
 Perform SmartSpa real time monitoring. 
  
 This module pulls all subsystems together to properly perform real time chemical level
@@ -13,7 +13,6 @@ import init
 import time
 import logging as log
 from control import balance_chemical
-#from sensing import get_error
 
 if __name__ == '__main__':
 

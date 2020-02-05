@@ -1,4 +1,4 @@
-"""@package sensing
+"""@module sensing
 Perform SmartSpa chemical level sensing 
  
 This module performs chemical level sensing by releasing a reagent into the mixing container,
@@ -85,7 +85,7 @@ def get_img():
 		cam_id = init.sensing_config.data['camera_id']
 
 		pygame.camera.init()
-		pygame.camera.list_cameras() #Camera detected or not
+		pygame.camera.list_cameras() 
 		cam = pygame.camera.Camera("/dev/video" + str(cam_id))
 		cam.start()
 		img = cam.get_image()

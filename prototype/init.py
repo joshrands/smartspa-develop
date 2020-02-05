@@ -1,4 +1,4 @@
-"""@package init
+"""@module init
 Initialize SmartSpa real time monitoring. 
  
 This module initializes all system for real time monitoring.  
