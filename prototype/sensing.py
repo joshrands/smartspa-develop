@@ -13,6 +13,9 @@ import logging as log
 import matplotlib.image as image
 import matplotlib.pyplot as plt
 import numpy as np
+from os import path
+import pygame
+import pygame.camera
 
 import init
 from helpers import get_distance_between_points_3d
@@ -24,6 +27,10 @@ def get_error(chemical, vis=False):
 	prepare_sample()
 
 	img = get_img()
+
+	if None == img.any():
+		log.error("Invalid image.")
+		return None
 
 	r,g,b = get_average_rgb_from_img(img)
 
@@ -45,6 +52,8 @@ def get_error(chemical, vis=False):
 
 	print("Closest to: %s" % closest_key)
 
+	return dist
+
 
 def prepare_sample():
 	"""Prepare the sample by mixing the reagent in the sample tube.
@@ -58,9 +67,12 @@ def get_img():
 	"""	
 
 	source = init.sensing_config.data['image_source'] 
+	width = init.sensing_config.data['img_width']
+	height = init.sensing_config.data['img_height']
 
 	if source == 'file':
 		log.info("Getting image from file.")
+
 		image_file = input("Enter image name: ")
 		img = image.imread("test/" + image_file)
 		# save image to sample.png for debugging	
@@ -68,13 +80,30 @@ def get_img():
 
 		return img
 
-	elif source == 'camera':
+	elif source == 'usb':
 		log.info("Getting image from camera.")
-		log.warning("Camera not implemented.")
+		cam_id = init.sensing_config.data['camera_id']
+
+		pygame.camera.init()
+		pygame.camera.list_cameras() #Camera detected or not
+		cam = pygame.camera.Camera("/dev/video" + str(cam_id))
+		cam.start()
+		img = cam.get_image()
+		img = pygame.transform.scale(img, (width, height))
+		pixels = pygame.surfarray.array3d(img)
+		pygame.image.save(img,"raw-sample.png")
+		cam.stop()
+
+		return pixels
+
+	elif source == 'rpi':
+		log.info("Getting image from RPi camera.")
+		log.warning("RPi camera not implemented.")
+
 	else:
 		log.error("Invalid image source.")
 
-	return []
+	return None
 
 
 def get_average_rgb_from_img(img):
@@ -126,7 +155,13 @@ def get_average_rgb_from_img(img):
 		clean_r = new_r
 		clean_g = new_g
 		clean_b = new_b
-	
+
+	# standardize all output.
+	if r_mean > 1 or g_mean > 1 or b_mean > 1:
+		r_mean /= 255.0
+		g_mean /= 255.0
+		b_mean /= 255.0
+
 	return r_mean, g_mean, b_mean 
 
 
@@ -134,7 +169,12 @@ def get_scale_map(chemical):
 	"""Return a dictionary of values to average rgb.
 	"""
 
-	in_file = open("calibrate/" + chemical + "/cal.csv", 'r')
+	file_path = "calibrate/" + chemical + "/cal.csv"
+	if not path.exists(file_path):
+		log.error("No calibration exists for chemical: %s" % chemical)
+		return
+
+	in_file = open(file_path, 'r')
 
 	lines = in_file.readlines()
 

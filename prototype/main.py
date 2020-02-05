@@ -31,6 +31,12 @@ if __name__ == '__main__':
 
 		if (True == init.main_config.data['pH']):
 			balance_chemical('pH', arg_vals['vis'])
+		if (True == init.main_config.data['Cl']):
+			balance_chemical('Cl', arg_vals['vis'])
+		if (True == init.main_config.data['alkalinity']):
+			balance_chemical('alkalinity', arg_vals['vis'])
+		if (True == init.main_config.data['calcium']):
+			balance_chemical('calcium', arg_vals['vis'])
 
 		# sleep for sample interval
 		time.sleep(sample_interval_s)
