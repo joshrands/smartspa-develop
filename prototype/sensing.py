@@ -26,7 +26,8 @@ def get_error(chemical, vis=False):
 
 	prepare_sample()
 
-	img = get_img()
+	source = init.sensing_config.data['image_source'] 
+	img = get_img(source)
 
 	if None == img.any():
 		log.error("Invalid image.")
@@ -52,6 +53,8 @@ def get_error(chemical, vis=False):
 
 	print("Closest to: %s" % closest_key)
 
+	# TODO: dist/error should include closest and second closest values
+	# TODO: Make a Kalman filter to estimate error?
 	return dist
 
 
@@ -62,19 +65,20 @@ def prepare_sample():
 	log.warning("Sample not prepared.")
 
 
-def get_img():
+def get_img(source, file_name=None):
 	"""Return a 2-dimensional array of rgb pixels.
 	"""	
 
-	source = init.sensing_config.data['image_source'] 
 	width = init.sensing_config.data['img_width']
 	height = init.sensing_config.data['img_height']
 
 	if source == 'file':
 		log.info("Getting image from file.")
 
-		image_file = input("Enter image name: ")
-		img = image.imread("test/" + image_file)
+		if None == file_name: 
+			file_name = input("Enter image name: ")
+
+		img = image.imread("test/" + file_name)
 		# save image to sample.png for debugging	
 		image.imsave('raw-sample.png', img)
 

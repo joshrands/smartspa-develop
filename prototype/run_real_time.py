@@ -1,4 +1,4 @@
-"""@module main
+"""@module run_real_time
 Perform SmartSpa real time monitoring. 
  
 This module pulls all subsystems together to properly perform real time chemical level
@@ -22,19 +22,19 @@ if __name__ == '__main__':
 
 	init.init(arg_vals['verbose'])
 
-	sample_interval_s = init.main_config.data['sample_interval_s']
+	sample_interval_s = init.real_time_config.data['sample_interval_s']
 
 	# Do everything
 	while True:
 		log.info("Checking system levels...")
 
-		if (True == init.main_config.data['pH']):
+		if (True == init.real_time_config.data['pH']):
 			balance_chemical('pH', arg_vals['vis'])
-		if (True == init.main_config.data['Cl']):
+		if (True == init.real_time_config.data['Cl']):
 			balance_chemical('Cl', arg_vals['vis'])
-		if (True == init.main_config.data['alkalinity']):
+		if (True == init.real_time_config.data['alkalinity']):
 			balance_chemical('alkalinity', arg_vals['vis'])
-		if (True == init.main_config.data['calcium']):
+		if (True == init.real_time_config.data['calcium']):
 			balance_chemical('calcium', arg_vals['vis'])
 
 		# sleep for sample interval

@@ -17,7 +17,7 @@ import os
 from sensing import get_average_rgb_from_img
 
 # Global Variables
-main_config = None
+real_time_config = None
 sensing_config = None
 
 
@@ -80,8 +80,8 @@ def init(verbose):
 
 	log.info("Initializing SmartSpa subsystems.")
 
-	global main_config
-	main_config = Config("main")
+	global real_time_config
+	real_time_config = Config("real_time")
 
 	init_sensing()
 	init_dispensing()
