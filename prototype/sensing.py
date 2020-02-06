@@ -18,7 +18,10 @@ import pygame
 import pygame.camera
 
 import init
-from helpers import get_distance_between_points_3d
+from helpers import get_distance_between_points_3d, running_on_rpi
+
+if running_on_rpi():
+	import RPi.GPIO as GPIO
 
 def get_error(chemical, vis=False):
 	"""Get the error for a given chemical 
@@ -65,6 +68,20 @@ def prepare_sample():
 	log.warning("Sample not prepared.")
 
 
+def set_sample_led(light_on, LED_PIN):
+	"""Turn on the LEDs surrounding the sample so a picture can be taken
+	"""
+
+	if running_on_rpi():
+		if None != LED_PIN:
+			# light_on = True will turn on LED, False will turn off
+			GPIO.output(LED_PIN, light_on)
+		else:
+			log.warning("LED pin set to None.")
+	else:
+		log.warning("Not running on RPi")
+
+
 def get_img(source, file_name=None):
 	"""Return a 2-dimensional array of rgb pixels.
 	"""	
@@ -92,7 +109,13 @@ def get_img(source, file_name=None):
 		pygame.camera.list_cameras() 
 		cam = pygame.camera.Camera("/dev/video" + str(cam_id))
 		cam.start()
+
+		# Take the picture
+		LED_PIN = init.sensing_config.data['led_pin']
+		set_sample_led(True, LED_PIN)
 		img = cam.get_image()
+		set_sample_led(False, LED_PIN)
+
 		img = pygame.transform.scale(img, (width, height))
 		pixels = pygame.surfarray.array3d(img)
 		pygame.image.save(img,"raw-sample.png")

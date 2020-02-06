@@ -9,6 +9,7 @@ Email: joshrands1@gmail.com
 import xml.etree.ElementTree as ET
 import logging as log
 import numpy as np
+import os.path as path
 
 def parse_xml(file_name):
 	"""Parse an xml file into a python dictionary
@@ -27,6 +28,8 @@ def parse_xml(file_name):
 			data[child.tag] = False 
 		elif (True == (root[count].text).isdigit()):
 			data[child.tag] = int(root[count].text)
+		elif (root[count].text == 'None'):
+			data[child.tag] = None
 		else:	
 			data[child.tag] = root[count].text	
 
@@ -45,3 +48,14 @@ def get_distance_between_points_3d(x, y):
 	return dist
 
 
+def running_on_rpi():
+	if path.exists('/proc/cpuinfo'):
+		# read file and look at model 
+		info_file = open("/proc/cpuinfo")
+		lines = info_file.readlines()
+
+		for line in lines:
+			if line.__contains__("Raspberry"):
+				return True
+
+	return False

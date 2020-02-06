@@ -6,4 +6,5 @@
 	<img_width>210</img_width>
 	<img_height>120</img_height>
 	<std>2</std>
+	<led_pin>None</led_pin>
 </sensing>

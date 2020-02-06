@@ -10,9 +10,12 @@ Email: joshrands1@gmail.com
 
 import logging as log
 import argparse
-from helpers import parse_xml
+from helpers import parse_xml, running_on_rpi
 import matplotlib.image as image
 import os
+
+if running_on_rpi():
+	import RPi.GPIO as GPIO
 
 from sensing import get_average_rgb_from_img
 
@@ -129,6 +132,14 @@ def init_sensing():
 
 	sensing_config = Config("sensing")
 
+	LED_PIN = sensing_config.data['led_pin']
+
+	if running_on_rpi():
+		GPIO.setmode(GPIO.BOARD)
+		# configure the LED_PIN as an output
+		if None != LED_PIN:
+			GPIO.setup(LED_PIN, GPIO.OUT)
+
 	if True == sensing_config.data['calibrate']:
 		log.info("Calibrating sensing scale...")
 		
@@ -136,6 +147,7 @@ def init_sensing():
 		
 		for file in os.listdir(calibrate_dir):
 			calibrate_chemical(os.fsdecode(file))
+
 
 def init_dispensing():
 	"""Initialize the dispensing subsystem.
