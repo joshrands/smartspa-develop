@@ -22,6 +22,8 @@ from helpers import get_distance_between_points_3d, running_on_rpi
 
 if running_on_rpi():
 	import RPi.GPIO as GPIO
+	import picamera
+	import picamera.array
 
 def get_error(chemical, vis=False):
 	"""Get the error for a given chemical 
@@ -125,7 +127,17 @@ def get_img(source, file_name=None):
 
 	elif source == 'rpi':
 		log.info("Getting image from RPi camera.")
-		log.warning("RPi camera not implemented.")
+
+		if running_on_rpi():
+			with picamera.PiCamera() as camera:
+				with picamera.array.PiRGBArray(camera) as stream:
+					camera.capture(stream, format='rgb') # was 'bgr'
+					# At this point the image is available as stream.array
+					img = stream.array
+					log.warning("Not saving raw image to raw-sample.png")
+					return img
+		else:
+			log.warning("Not running on RPi.")
 
 	else:
 		log.error("Invalid image source.")
