@@ -14,9 +14,6 @@ import matplotlib.image as image
 import matplotlib.pyplot as plt
 import numpy as np
 from os import path
-import pygame
-import pygame.camera
-
 import init
 from helpers import get_distance_between_points_3d, running_on_rpi
 
@@ -24,6 +21,10 @@ if running_on_rpi():
 	import RPi.GPIO as GPIO
 	import picamera
 	import picamera.array
+else:
+    import pygame
+    import pygame.camera
+
 
 def get_error(chemical, vis=False):
 	"""Get the error for a given chemical 
@@ -131,10 +132,12 @@ def get_img(source, file_name=None):
 		if running_on_rpi():
 			with picamera.PiCamera() as camera:
 				with picamera.array.PiRGBArray(camera) as stream:
+					camera.resolution = (width, height)
 					camera.capture(stream, format='rgb') # was 'bgr'
-					# At this point the image is available as stream.array
+                                        # At this point the image is available as stream.array
 					img = stream.array
-					log.warning("Not saving raw image to raw-sample.png")
+                                        # save to file
+					camera.capture('raw-sample.png')
 					return img
 		else:
 			log.warning("Not running on RPi.")
