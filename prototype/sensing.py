@@ -78,6 +78,7 @@ def set_sample_led(light_on, LED_PIN):
 	if running_on_rpi():
 		if None != LED_PIN:
 			# light_on = True will turn on LED, False will turn off
+			log.info("Setting sample LED to " + str(light_on))
 			GPIO.output(LED_PIN, light_on)
 		else:
 			log.warning("LED pin set to None.")
@@ -132,12 +133,22 @@ def get_img(source, file_name=None):
 		if running_on_rpi():
 			with picamera.PiCamera() as camera:
 				with picamera.array.PiRGBArray(camera) as stream:
+					# Turn on LED 
+					LED_PIN = init.sensing_config.data['led_pin']
+					set_sample_led(True, LED_PIN)
+
+					# adjust resolution for easier data processing 
 					camera.resolution = (width, height)
+					# TODO: Double check bgr is okay or try rgb again...
 					camera.capture(stream, format='rgb') # was 'bgr'
-                                        # At this point the image is available as stream.array
+          # At this point the image is available as stream.array
 					img = stream.array
-                                        # save to file
+          # save to file
 					camera.capture('raw-sample.png')
+
+					# Turn off LED 
+					set_sample_led(False, LED_PIN)
+
 					return img
 		else:
 			log.warning("Not running on RPi.")
