@@ -9,6 +9,7 @@ Date: 2/3/2020
 Email: joshrands1@gmail.com
 """
 
+import time
 import logging as log
 import matplotlib.image as image
 import matplotlib.pyplot as plt
@@ -136,6 +137,8 @@ def get_img(source, file_name=None):
 					# Turn on LED 
 					LED_PIN = init.sensing_config.data['led_pin']
 					set_sample_led(True, LED_PIN)
+					# sleep to guarantee led is on...
+					time.sleep(0.1)
 
 					# adjust resolution for easier data processing 
 					camera.resolution = (width, height)
@@ -162,6 +165,8 @@ def get_img(source, file_name=None):
 def get_average_rgb_from_img(img):
 	"""Clean the image 2-dimensional array into single rgb values.
 	"""
+	log.info("Cleaning image data...")
+
 	num_deviations = init.sensing_config.data['std']
 
 	total_blue = 0

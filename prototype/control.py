@@ -17,5 +17,5 @@ def balance_chemical(chemical, vis=False):
 
 	error = get_error(chemical, vis)
 
-	log.info("%s error = %0.4d" % (chemical, error))
+	log.info("%s error = %.4d" % (chemical, error))
 
