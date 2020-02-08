@@ -13,4 +13,10 @@ echo $output;
 echo "<br>";
 echo "Network connection complete.";
 
+echo "Rebooting system...";
+
+sleep(3);
+
+shell_exec('python3 reboot.py');
+
 ?>
