@@ -12,11 +12,10 @@ echo $output;
 
 echo "<br>";
 echo "Network connection complete.";
-
+echo "<br>";
+echo "<br>";
 echo "Rebooting system...";
 
-sleep(3);
-
-shell_exec('python3 reboot.py');
+system('python3 reboot.py > reboot-log.txt &');
 
 ?>
