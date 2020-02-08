@@ -1,0 +1,58 @@
+
+body, html {
+	background-color: CadetBlue;
+}
+
+.title {
+	color: white;
+	font-weight: bold;
+	font-size: 200%;
+	text-align: center;
+}
+
+.prompt-text {
+	color: white;
+	font-weight: normal;
+	font-size: 150%;
+	text-align: center;
+}
+
+.container {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+}
+
+.input {
+	font-weight: normal;
+	font-size: 100%;
+}
+
+.button {
+    background-color: CadetBlue;
+    border: white;
+    text-align: center;
+    font-weight: bold;
+		font-size: 100%;
+		color: white;
+		font-size: 150%;
+		width: 40%;
+		margin-left: 30%;
+		margin-right: 30%;
+}
+
+.button:disabled {
+    opacity: 0.6;
+		color: grey;
+    /* background-color: #555555; */
+}
+
+.button:hover:enabled {
+    background-color: white;
+    border: CadetBlue;
+		color: black;
+}
+
