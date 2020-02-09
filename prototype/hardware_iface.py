@@ -46,10 +46,10 @@ class Hardware:
 
 		if running_on_rpi():
 			if pin_type == 'OUTPUT':
-				GPIO.setmode(pin_number, GPIO.OUT)
+				GPIO.setup(pin_number, GPIO.OUT)
 				self.PIN_TYPES[pin_number] = pin_type
 			elif pin_type == 'INPUT':
-				GPIO.setmode(pin_number, GPIO.IN)
+				GPIO.setup(pin_number, GPIO.IN)
 				self.PIN_TYPES[pin_number] = pin_type
 			else:
 				log.warning("Unknown pin type: %s" % pin_type)
