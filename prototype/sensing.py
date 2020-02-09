@@ -111,9 +111,9 @@ def get_img(source, file_name=None):
 		cam.start()
 
 		# Take the picture
-		init.hardware.set_pin('sensing_led_pin', True)
+		init.hardware.set_pin('sensing_led', True)
 		img = cam.get_image()
-		init.hardware.set_pin('sensing_led_pin', False)
+		init.hardware.set_pin('sensing_led', False)
 
 		img = pygame.transform.scale(img, (width, height))
 		pixels = pygame.surfarray.array3d(img)
@@ -129,7 +129,7 @@ def get_img(source, file_name=None):
 			with picamera.PiCamera() as camera:
 				with picamera.array.PiRGBArray(camera) as stream:
 					# Turn on LED 
-					init.hardware.set_pin('sensing_led_pin', True)
+					init.hardware.set_pin('sensing_led', True)
 
 					# sleep to guarantee led is on...
 					time.sleep(0.1)
@@ -144,7 +144,7 @@ def get_img(source, file_name=None):
 					camera.capture('raw-sample.png')
 
 					# Turn off LED 
-					init.hardware.set_pin('sensing_led_pin', False)
+					init.hardware.set_pin('sensing_led', False)
 
 					return img
 		else:
