@@ -136,6 +136,9 @@ def init_sensing():
 
 	sensing_config = Config("sensing")
 
+	if running_on_rpi():
+		sensing_config.data['image_source'] = 'rpi'
+
 	if True == sensing_config.data['calibrate']:
 		log.info("Calibrating sensing scale...")
 		
