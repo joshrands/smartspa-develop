@@ -1,4 +1,8 @@
 <hardware>
-	<sample_interval_s>2</sample_interval_s>
+	<spa_jets_pin>11</spa_jets_pin>
+	<main_line_pump_pin>13</main_line_pump_pin>
+	<reagent_solenoid_valve_pin>15</reagent_solenoid_valve_pin>
+	<ph_reagent_peristaltic_pump_pin>16</ph_reagent_peristaltic_pump_pin>
+	<mixing_prop_motor_pin>18</mixing_prop_motor_pin>
 	<sensing_led_pin>37</sensing_led_pin>
 </hardware>

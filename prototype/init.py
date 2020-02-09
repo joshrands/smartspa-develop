@@ -193,14 +193,22 @@ def init_hardware():
 
 	# Get pin numbers from configuration file
 	SENSING_LED_PIN = hardware_config.data['sensing_led_pin']
+	SPA_JETS_PIN = hardware_config.data['spa_jets_pin']
+	MAIN_LINE_PUMP_PIN = hardware_config.data['main_line_pump_pin']
+	REAGENT_SOLENOID_VALVE_PIN = hardware_config.data['reagent_solenoid_valve_pin']
+	PH_PERISTALTIC_PUMP_PIN = hardware_config.data['ph_reagent_peristaltic_pump_pin']
+	MIXING_PROP_MOTOR_PIN = hardware_config.data['mixing_prop_motor_pin']
 
 	if running_on_rpi():
 		# configure the SENSING_LED_PIN as an output
 		hardware.add_pin("sensing_led", SENSING_LED_PIN, 'OUTPUT')
-		
+		hardware.add_pin("spa_jets", SPA_JETS_PIN, 'OUTPUT')
+		hardware.add_pin("main_line_pump", MAIN_LINE_PUMP_PIN, 'OUTPUT')
+		hardware.add_pin("reagent_solenoid_valve", REAGENT_SOLENOID_VALVE_PIN, 'OUTPUT')
+		hardware.add_pin("ph_pump", PH_PERISTALTIC_PUMP_PIN, 'OUTPUT')
+		hardware.add_pin("mixing_prop_motor", MIXING_PROP_MOTOR_PIN, 'OUTPUT')
 
-	log.warning("Mix reagent init incomplete.")
-	log.warning("Dispensing init incomplete.")
+	log.warning("Dispensing hardware init incomplete.")
 
 
 def init_ui():
