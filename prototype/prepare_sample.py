@@ -67,6 +67,7 @@ def prepare_sample(chemical):
 	close_main_valve_halfway()
 
 	# Wait for test chamber to fill 
+	log.info("Waiting for test chamber to fill with water...")
 	time.sleep(test_chamber_fill_time_s)
 
 	# Open main line valve all the way 
@@ -79,6 +80,7 @@ def prepare_sample(chemical):
 	init.hardware.set_pin(chemical + '_pump', True)
 
 	# Wait until reagent drops are dispensed
+	log.info("Waiting for reagent drops to be dispensed...")
 	time.sleep(reagent_drip_time_s)
 
 	# Turn off reagent peristaltic pump 

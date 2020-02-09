@@ -40,5 +40,6 @@ if __name__ == '__main__':
 			balance_chemical('calcium', arg_vals['vis'])
 
 		# sleep for sample interval
+		log.info("Cycle complete! Waiting %d seconds before next sample." % sample_interval_s)
 		time.sleep(sample_interval_s)
 
