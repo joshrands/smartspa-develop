@@ -33,7 +33,7 @@ def get_error(chemical, vis=False):
 	"""Get the error for a given chemical 
 	"""
 
-	prepare_sample()
+	prepare_sample(chemical.lower())
 
 	source = init.sensing_config.data['image_source'] 
 	img = get_img(source)

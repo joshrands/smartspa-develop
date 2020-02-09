@@ -4,5 +4,7 @@
 	<reagent_solenoid_valve_pin>15</reagent_solenoid_valve_pin>
 	<ph_reagent_peristaltic_pump_pin>16</ph_reagent_peristaltic_pump_pin>
 	<mixing_prop_motor_pin>18</mixing_prop_motor_pin>
+	<open_main_line_valve_pin>19</open_main_line_valve_pin>
+	<close_main_line_valve_pin>21</close_main_line_valve_pin>
 	<sensing_led_pin>37</sensing_led_pin>
 </hardware>

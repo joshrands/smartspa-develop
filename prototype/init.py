@@ -18,47 +18,13 @@ if running_on_rpi():
 	import RPi.GPIO as GPIO
 
 from sensing import get_average_rgb_from_img
+from hardware_iface import Hardware
 
 # Global Variables
 hardware = None 
 real_time_config = None
 sensing_config = None
 hardware_config = None
-
-class Hardware:
-	"""Hardware class.
-
-	Stores PIN information for hardware components connected to our board.
-	"""
-
-	def __init__(self):
-		"""Initialize the hardware class by configuring hardware setup.
-		"""
-		self.PINS = {}
-
-		# configure raspberry pi to BOARD mode 
-		# this means all pin numbers should be the true pin number on the pi
-		if running_on_rpi():
-			GPIO.setmode(GPIO.BOARD)
-			log.info("Raspberry pi set to GPIO.BOARD.")
-
-		log.info("Hardware class created.")
-
-	def add_pin(name, pin_number, pin_type):
-		if None != pin_number:
-			self.PINS[name] = pin_number
-		else:
-			log.warning("No pin number set for %s" % name)
-			return
-
-		if pin_type == 'OUTPUT':
-			GPIO.setmode(pin_number, GPIO.OUT)
-		elif pin_type == 'INPUT':
-			GPIO.setmode(pin_number, GPIO.IN)
-		else:
-			log.warning("Unknown pin type: %s" % pin_type)
-
-		log.info("%s set to pin %d as type %s" % (name, pin_number, pin_type))
 
 class Config:
 	"""Config base class.
@@ -80,6 +46,7 @@ class Config:
 
 		self.parse_config_file()
 
+
 	def parse_config_file(self):
 		"""Parse configuration file and store data in data dictionary.
 		"""
@@ -92,6 +59,7 @@ class Config:
 
 			log.info(self.data)
 	
+
 def get_args():
 	"""Parse command line arguments.
 	"""
@@ -197,16 +165,23 @@ def init_hardware():
 	MAIN_LINE_PUMP_PIN = hardware_config.data['main_line_pump_pin']
 	REAGENT_SOLENOID_VALVE_PIN = hardware_config.data['reagent_solenoid_valve_pin']
 	PH_PERISTALTIC_PUMP_PIN = hardware_config.data['ph_reagent_peristaltic_pump_pin']
+
+	OPEN_MAIN_LINE_VALVE_PIN = hardware_config.data['open_main_line_valve_pin']
+	CLOSE_MAIN_LINE_VALVE_PIN = hardware_config.data['close_main_line_valve_pin']
+
+	# this will likely be 4 pins to drive a stepper 
 	MIXING_PROP_MOTOR_PIN = hardware_config.data['mixing_prop_motor_pin']
 
+	# configure all rpi pins
 	if running_on_rpi():
-		# configure the SENSING_LED_PIN as an output
 		hardware.add_pin("sensing_led", SENSING_LED_PIN, 'OUTPUT')
 		hardware.add_pin("spa_jets", SPA_JETS_PIN, 'OUTPUT')
 		hardware.add_pin("main_line_pump", MAIN_LINE_PUMP_PIN, 'OUTPUT')
 		hardware.add_pin("reagent_solenoid_valve", REAGENT_SOLENOID_VALVE_PIN, 'OUTPUT')
 		hardware.add_pin("ph_pump", PH_PERISTALTIC_PUMP_PIN, 'OUTPUT')
 		hardware.add_pin("mixing_prop_motor", MIXING_PROP_MOTOR_PIN, 'OUTPUT')
+		hardware.add_pin("open_main_line_valve", OPEN_MAIN_LINE_VALVE_PIN, 'OUTPUT')
+		hardware.add_pin("close_main_line_valve", CLOSE_MAIN_LINE_VALVE_PIN, 'OUTPUT')
 
 	log.warning("Dispensing hardware init incomplete.")
 
