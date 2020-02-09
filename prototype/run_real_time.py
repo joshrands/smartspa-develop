@@ -12,7 +12,8 @@ Email: joshrands1@gmail.com
 import init
 import time
 import logging as log
-from control import balance_chemical
+from controller import balance_chemical
+
 
 if __name__ == '__main__':
 

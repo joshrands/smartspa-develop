@@ -20,9 +20,45 @@ if running_on_rpi():
 from sensing import get_average_rgb_from_img
 
 # Global Variables
+hardware = None 
 real_time_config = None
 sensing_config = None
+hardware_config = None
 
+class Hardware:
+	"""Hardware class.
+
+	Stores PIN information for hardware components connected to our board.
+	"""
+
+	def __init__(self):
+		"""Initialize the hardware class by configuring hardware setup.
+		"""
+		self.PINS = {}
+
+		# configure raspberry pi to BOARD mode 
+		# this means all pin numbers should be the true pin number on the pi
+		if running_on_rpi():
+			GPIO.setmode(GPIO.BOARD)
+			log.info("Raspberry pi set to GPIO.BOARD.")
+
+		log.info("Hardware class created.")
+
+	def add_pin(name, pin_number, pin_type):
+		if None != pin_number:
+			self.PINS[name] = pin_number
+		else:
+			log.warning("No pin number set for %s" % name)
+			return
+
+		if pin_type == 'OUTPUT':
+			GPIO.setmode(pin_number, GPIO.OUT)
+		elif pin_type == 'INPUT':
+			GPIO.setmode(pin_number, GPIO.IN)
+		else:
+			log.warning("Unknown pin type: %s" % pin_type)
+
+		log.info("%s set to pin %d as type %s" % (name, pin_number, pin_type))
 
 class Config:
 	"""Config base class.
@@ -87,7 +123,7 @@ def init(verbose):
 	real_time_config = Config("real_time")
 
 	init_sensing()
-	init_dispensing()
+	init_hardware()
 	init_ui()
 	init_db()
 
@@ -132,14 +168,6 @@ def init_sensing():
 
 	sensing_config = Config("sensing")
 
-	LED_PIN = sensing_config.data['led_pin']
-
-	if running_on_rpi():
-		GPIO.setmode(GPIO.BOARD)
-		# configure the LED_PIN as an output
-		if None != LED_PIN:
-			GPIO.setup(LED_PIN, GPIO.OUT)
-
 	if True == sensing_config.data['calibrate']:
 		log.info("Calibrating sensing scale...")
 		
@@ -149,10 +177,29 @@ def init_sensing():
 			calibrate_chemical(os.fsdecode(file))
 
 
-def init_dispensing():
+def init_hardware():
 	"""Initialize the dispensing subsystem.
 	"""
-	
+
+	global hardware_config 
+	global hardware
+
+	# initialize hardware class 
+	hardware = Hardware()
+
+	log.info("Initializing hardware systems.")
+
+	hardware_config = Config("hardware")
+
+	# Get pin numbers from configuration file
+	SENSING_LED_PIN = hardware_config.data['sensing_led_pin']
+
+	if running_on_rpi():
+		# configure the SENSING_LED_PIN as an output
+		hardware.add_pin("sensing_led", SENSING_LED_PIN, 'OUTPUT')
+		
+
+	log.warning("Mix reagent init incomplete.")
 	log.warning("Dispensing init incomplete.")
 
 

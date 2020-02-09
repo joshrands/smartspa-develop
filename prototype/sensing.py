@@ -15,8 +15,10 @@ import matplotlib.image as image
 import matplotlib.pyplot as plt
 import numpy as np
 from os import path
+
 import init
 from helpers import get_distance_between_points_3d, running_on_rpi
+from prepare_sample import prepare_sample
 
 if running_on_rpi():
 	import RPi.GPIO as GPIO
@@ -65,13 +67,6 @@ def get_error(chemical, vis=False):
 	return dist
 
 
-def prepare_sample():
-	"""Prepare the sample by mixing the reagent in the sample tube.
-	"""
-
-	log.warning("Sample not prepared.")
-
-
 def set_sample_led(light_on, LED_PIN):
 	"""Turn on the LEDs surrounding the sample so a picture can be taken
 	"""
@@ -116,7 +111,7 @@ def get_img(source, file_name=None):
 		cam.start()
 
 		# Take the picture
-		LED_PIN = init.sensing_config.data['led_pin']
+		LED_PIN = init.hardware_config.data['sensing_led_pin']
 		set_sample_led(True, LED_PIN)
 		img = cam.get_image()
 		set_sample_led(False, LED_PIN)

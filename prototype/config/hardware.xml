@@ -1,0 +1,4 @@
+<hardware>
+	<sample_interval_s>2</sample_interval_s>
+	<sensing_led_pin>37</sensing_led_pin>
+</hardware>
