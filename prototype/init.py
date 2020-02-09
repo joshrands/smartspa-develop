@@ -13,6 +13,8 @@ import argparse
 from helpers import parse_xml, running_on_rpi
 import matplotlib.image as image
 import os
+import sys
+import signal
 
 if running_on_rpi():
 	import RPi.GPIO as GPIO
@@ -202,3 +204,14 @@ def init_db():
 
 	log.warning("Database init incomplete.")
 
+def signal_handler(sig, frame):
+	log.info('You pressed Ctrl+C')
+	log.warning("Shutting down SmartSpa system...")
+
+	if running_on_rpi():
+		GPIO.cleanup()
+		log.info("GPIO cleaned.")
+
+	sys.exit(0)
+	
+signal.signal(signal.SIGINT, signal_handler)
