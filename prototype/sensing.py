@@ -38,7 +38,7 @@ def get_error(chemical, vis=False):
 	source = init.sensing_config.data['image_source'] 
 	img = get_img(source)
 
-	if None == img.any():
+	if None == img:
 		log.error("Invalid image.")
 		return None
 

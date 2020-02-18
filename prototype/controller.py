@@ -26,7 +26,8 @@ def balance_chemical(chemical, vis=False):
 	# get error from sensing system
 	error = get_error(chemical, vis)
 
-	log.info("%s error = %.4d" % (chemical, error))
+	if error != None:
+		log.info("%s error = %.4d" % (chemical, error))
 
 	# release appropriate amount of chemical into system
 	release_chemical(chemical, 0)
