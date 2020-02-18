@@ -19,7 +19,6 @@ import signal
 if running_on_rpi():
 	import RPi.GPIO as GPIO
 
-from sensing import get_average_rgb_from_img
 from hardware_iface import Hardware
 
 # Global Variables
@@ -99,6 +98,8 @@ def init(verbose):
 
 
 def calibrate_chemical(chemical):
+	from sensing import get_average_rgb_from_img
+
 	log.info("Calibrating %s" % chemical)
 
 	directory = os.fsencode("calibrate/" + chemical)

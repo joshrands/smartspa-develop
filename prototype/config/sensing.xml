@@ -1,7 +1,7 @@
 <sensing>
 	<calibrate>false</calibrate>
 	<!--Image source can be file, usb(camera), rpi(camera)-->
-	<image_source>usb</image_source>
+	<image_source>rpi</image_source>
 	<camera_id>0</camera_id>
 	<img_width>210</img_width>
 	<img_height>120</img_height>

@@ -1,4 +1,4 @@
-"""@module hardware
+"""@module hardware_iface
 Manage system hardware.
 
 Author: Josh Rands

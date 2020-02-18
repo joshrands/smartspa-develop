@@ -43,3 +43,4 @@ if __name__ == '__main__':
 		log.info("Cycle complete! Waiting %d seconds before next sample." % sample_interval_s)
 		time.sleep(sample_interval_s)
 
+# SIGINT is captured in init.py
