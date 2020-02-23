@@ -16,6 +16,95 @@ import logging as log
 from sensing import get_img, get_average_rgb_from_img, get_scale_map, get_distance_between_points_3d
 import init 
 
+
+def interpolate_rgb_values(chemical, value):
+    scale = get_scale_map(chemical)
+
+    # find closest two
+    count = 0
+
+    low_value = 0
+    high_value = 9999999
+
+    for key in scale:
+        dif = value - float(key)
+
+        print(float(key))
+
+        if dif == 0:
+            # return rgb values 
+            print
+            return [value,scale[key]], [value,scale[key]], [value,scale[key]]
+        elif dif > 0 and float(key) > low_value:
+            low_value = float(key)
+#            print("Low: " + str(low_value))
+        elif dif < 0 and float(key) < high_value:
+            high_value = float(key)
+#            print("High: " + str(high_value))
+
+    print(str(value) + " between " + str(low_value) + " and " + str(high_value)) 
+
+    # interpolate rgb values 
+    ratio = (float(value) - low_value) / (float(high_value) - float(low_value))
+    inter_r = float(255 * scale[str(low_value)][0] + (scale[str(high_value)][0] - scale[str(low_value)][0]) * ratio * 255) / 255.0
+    inter_g = float(255 * scale[str(low_value)][1] + (scale[str(high_value)][1] - scale[str(low_value)][1]) * ratio * 255) / 255.0 
+    inter_b = float(255 * scale[str(low_value)][2] + (scale[str(high_value)][2] - scale[str(low_value)][2]) * ratio * 255) / 255.0 
+
+    print(inter_r, inter_g, inter_b)
+
+    low_rgb = scale[str(low_value)]# [float(255*val) for val in scale[str(low_value)]]
+    high_rgb = scale[str(high_value)] # [float(255*val) for val in scale[str(high_value)]]
+
+    print(low_rgb)
+    print(high_rgb)
+
+    return [value,[inter_r, inter_g, inter_b]], [low_value,low_rgb], [high_value,high_rgb]
+
+
+def create_interpolated_rgb_graph(chemical, increments=10, labels=False):
+    scale = get_scale_map(chemical)
+
+    red = []
+    green = []
+    blue = []
+    values = []
+
+    # 3D Plot
+    fig = plt.figure()
+    ax = Axes3D(fig)
+
+    previous_key = "" 
+    for key in sorted (scale.keys()): 
+        # interpolate increments amount towards next key 
+        if len(red) > 0:
+            inc_size = (float(key) - float(previous_key)) / float(increments)
+            for i in range(1,increments):
+                print("Interpolating " + str(float(previous_key) + inc_size * i))
+                actual,low,high = interpolate_rgb_values(chemical, float(previous_key) + inc_size * i)
+                red.append(actual[1][0])
+                green.append(actual[1][1])
+                blue.append(actual[1][2])
+                if labels:
+                    ax.text(red[-1],green[-1],blue[-1],str(float(previous_key) + inc_size * i))
+
+        red.append(scale[key][0])
+        green.append(scale[key][1])
+        blue.append(scale[key][2])
+        ax.text(red[-1],green[-1],blue[-1],key)
+
+        previous_key = key
+
+    ax.scatter(red,green,blue)
+
+    ax.set_title(chemical + '_rgb_3d')
+    ax.set_xlabel("Red")
+    ax.set_ylabel("Green")
+    ax.set_zlabel("Blue")
+
+    plt.savefig('./research/' + chemical + '/rgb_interpolated_3d.png')
+    plt.show()
+
+
 def create_scale_hue_graph(chemical):
     scale = get_scale_map(chemical)
 
@@ -99,53 +188,15 @@ def create_scale_hue_graph(chemical):
     plt.show()
 
 
-def interpolate_rgb_values(chemical, value):
-    scale = get_scale_map(chemical)
-
-    # find closest two
-    count = 0
-
-    low_value = 0
-    high_value = 9999999
-
-    for key in scale:
-        dif = value - float(key)
-
-        print(float(key))
-
-        if dif == 0:
-            print("Exact match! WARNING NOT IMPLEMENTED")
-        elif dif > 0 and float(key) > low_value:
-            low_value = float(key)
-#            print("Low: " + str(low_value))
-        elif dif < 0 and float(key) < high_value:
-            high_value = float(key)
-#            print("High: " + str(high_value))
-
-    print(str(value) + " between " + str(low_value) + " and " + str(high_value)) 
-
-    # interpolate rgb values 
-    ratio = (float(value) - low_value) / (float(high_value) - float(low_value))
-    inter_r = int(255 * scale[str(low_value)][0] + (scale[str(high_value)][0] - scale[str(low_value)][0]) * ratio * 255) 
-    inter_g = int(255 * scale[str(low_value)][1] + (scale[str(high_value)][1] - scale[str(low_value)][1]) * ratio * 255) 
-    inter_b = int(255 * scale[str(low_value)][2] + (scale[str(high_value)][2] - scale[str(low_value)][2]) * ratio * 255) 
-
-    print(inter_r, inter_g, inter_b)
-
-    low_rgb = [int(255*val) for val in scale[str(low_value)]]
-    high_rgb = [int(255*val) for val in scale[str(high_value)]]
-
-    print(low_rgb)
-    print(high_rgb)
-
-    palette = np.array([low_rgb,
-               [inter_r, inter_g, inter_b],
-                high_rgb])
+def visualize_interpolation(chemical, actual_rgb, low_rgb, high_rgb):
+    palette = np.array([low_rgb[1],
+                actual_rgb[1],
+                high_rgb[1]])
 
     indices = np.array([[0,1,2]])
 
     io.imshow(palette[indices])
-    plt.title(chemical + ' ' + str(low_value) + ',' + str(value) + ',' + str(high_value))
+    plt.title(chemical + ' ' + str(low_rgb[0]) + ',' + str(actual_rgb[0]) + ',' + str(high_rgb[0]))
     plt.show()
 
 if __name__ == '__main__':
@@ -154,12 +205,16 @@ if __name__ == '__main__':
 
     init.init(arg_vals['verbose'])
 
-    interpolate_rgb_values('pH',6.2)
-    interpolate_rgb_values('pH',6.9)
-    interpolate_rgb_values('pH',7.4)
-    interpolate_rgb_values('pH',7.8)
+    create_interpolated_rgb_graph('pH', 5, True)
 
-#    create_scale_hue_graph('pH')
+    test_values = [['pH',6.8],['pH',7.0],['pH',7.3],['pH',7.4]]
+
+    for value_pair in test_values:
+        actual_rgb, low_rgb, high_rgb = interpolate_rgb_values(value_pair[0], value_pair[1])
+        visualize_interpolation('pH', actual_rgb, low_rgb, high_rgb)
+
+
+    create_scale_hue_graph('pH')
 #    create_scale_hue_graph('Cl')
 #    create_scale_hue_graph('alkalinity')
 
