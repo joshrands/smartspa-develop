@@ -73,9 +73,16 @@ def create_interpolated_rgb_graph(chemical, increments=10, labels=False):
     fig = plt.figure()
     ax = Axes3D(fig)
 
-    previous_key = "" 
-    for key in sorted (scale.keys()): 
+    # turn keys into floats to sort 
+    keys = sorted([float(val) for val in list(scale.keys())])
+    # turn keys back into strings 
+    keys = [str(val) for val in keys]
+    previous_key = None 
+    print(keys)
+    print(scale.keys())
+    for key in keys: 
         # interpolate increments amount towards next key 
+
         if len(red) > 0:
             inc_size = (float(key) - float(previous_key)) / float(increments)
             for i in range(1,increments):
@@ -87,6 +94,8 @@ def create_interpolated_rgb_graph(chemical, increments=10, labels=False):
                 if labels:
                     ax.text(red[-1],green[-1],blue[-1],str(float(previous_key) + inc_size * i))
 
+        if key == '0.0':
+            key = '0'
         red.append(scale[key][0])
         green.append(scale[key][1])
         blue.append(scale[key][2])
@@ -206,6 +215,8 @@ if __name__ == '__main__':
     init.init(arg_vals['verbose'])
 
     create_interpolated_rgb_graph('pH', 5, True)
+    create_interpolated_rgb_graph('alkalinity', 5, True)
+    create_interpolated_rgb_graph('Cl', 5, True)
 
     test_values = [['pH',6.8],['pH',7.0],['pH',7.3],['pH',7.4]]
 

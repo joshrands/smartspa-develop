@@ -1,5 +1,5 @@
 <sensing>
-	<calibrate>false</calibrate>
+	<calibrate>true</calibrate>
 	<!--Image source can be file, usb(camera), rpi(camera)-->
 	<image_source>rpi</image_source>
 	<camera_id>0</camera_id>

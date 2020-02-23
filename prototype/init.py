@@ -121,7 +121,11 @@ def calibrate_chemical(chemical):
 		whole = nums[0]
 		decimal = nums[1].split('.')[0]
 
-		out_file.write(whole + "." + decimal + ",")
+		out_file.write(whole)
+		if int(whole) != 0 or int(decimal) != 0:
+			out_file.write("." + decimal + ",")
+		else:
+			out_file.write(",")
 		out_file.write("(" + str(r) + " " + str(g) + " " + str(b) + ")\n")
 
 	out_file.close()
