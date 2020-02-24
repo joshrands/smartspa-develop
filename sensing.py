@@ -21,7 +21,6 @@ import colorsys
 
 import init
 from helpers import get_distance_between_points_3d, running_on_rpi
-from prepare_sample import prepare_sample
 
 if running_on_rpi():
 	import RPi.GPIO as GPIO
@@ -33,6 +32,10 @@ else:
 
 
 def interpolate_chemical_property_from_img_hue(chemical, img):
+	""" Interpolate the value of a chemical property using
+	linear interpolation from the scale and the hue of each image.
+	"""
+
 	r,g,b = get_average_rgb_from_img(img)
 	
 	scale = get_scale_map(chemical)
@@ -68,7 +71,7 @@ def interpolate_chemical_property_from_img_hue(chemical, img):
 
 		if (distances[0] < distances[1]):
 			# we are less than minimum
-			print("[WARNING]: Value outside of scale range.")
+			log.warning("Value outside of scale range.")
 
 		low_index = 0
 		high_index = 1
@@ -102,7 +105,14 @@ def interpolate_chemical_property_from_img_hue(chemical, img):
 
 	return interpolated_value
 
+
 def interpolate_chemical_property_from_img_rgb(chemical, img):
+	""" Interpolate the value of a chemical property using the 
+	rgb values of the scale images. This is done by linearly interpolating
+	between the values in 3D space after projecting the point 
+	in question onto the closest line segment. 
+	"""
+
 	r,g,b = get_average_rgb_from_img(img)
 
 	scale = get_scale_map(chemical)
@@ -119,7 +129,7 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 
 	# find the closest r,g,b value 
 	closest_index = distances.index(min(distances))
-	print("Closest to " + sorted_keys[closest_index])
+	log.info("Closest to " + sorted_keys[closest_index])
 
 	# find if high or low is closer 
 	low_index = 0
@@ -129,10 +139,9 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 	# or inbetween lowest and second lowest 
 	if (0 == closest_index):
 
-		print(distances[0], distances[1])
 		if (distances[0] < distances[1]):
 			# we are less than minimum
-			print("[WARNING]: Value outside of scale range.")
+			log.warning("[WARNING]: Value outside of scale range.")
 
 		low_index = 0
 		high_index = 1
@@ -174,10 +183,10 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 
 	return interpolated_value
 
-
+"""
 def get_error(chemical, vis=False):
-	"""Get the error for a given chemical 
-	"""
+	DEPRECATED. DO NOT USE.
+	Get the error for a given chemical 
 
 	prepare_sample(chemical.lower())
 
@@ -206,10 +215,8 @@ def get_error(chemical, vis=False):
 			closest = dist
 			closest_key = key
 
-	print("Closest to: %s" % closest_key)
-
-	# TODO: dist/error should include closest and second closest values
 	return dist
+"""
 
 
 def set_sample_led(light_on, LED_PIN):

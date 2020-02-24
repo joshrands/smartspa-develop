@@ -26,6 +26,8 @@ hardware = None
 real_time_config = None
 sensing_config = None
 hardware_config = None
+control_config = None
+system_config = None
 
 class Config:
 	"""Config base class.
@@ -93,6 +95,8 @@ def init(verbose):
 
 	init_sensing()
 	init_hardware()
+	init_control()
+	init_system()
 	init_ui()
 	init_db()
 
@@ -194,6 +198,28 @@ def init_hardware():
 		hardware.add_pin("close_main_line_valve", CLOSE_MAIN_LINE_VALVE_PIN, 'OUTPUT')
 
 	log.warning("Dispensing hardware init incomplete.")
+
+
+def init_control():
+	"""Initialize controller parameters 
+	"""
+	
+	global control_config
+
+	log.info("Initializing control subsystem.")
+
+	control_config = Config("control")
+
+
+def init_system():
+	"""Initialize the system parameters  
+	"""
+	
+	global system_config
+
+	log.info("Initializing system information.")
+
+	system_config = Config("system")
 
 
 def init_ui():

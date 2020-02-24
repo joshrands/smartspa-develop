@@ -9,8 +9,9 @@ Email: joshrands1@gmail.com
 import logging as log
 import time
 
-from sensing import get_error
+from sensing import get_img, interpolate_chemical_property_from_img_hue, interpolate_chemical_property_from_img_rgb
 from release_chemical import release_chemical 
+from prepare_sample import prepare_sample
 import init
 
 # Global params
@@ -23,22 +24,87 @@ def balance_chemical(chemical, vis=False):
 
 	log.info("Balancing %s" % chemical)
 
-	# get error from sensing system
-	error = get_error(chemical, vis)
+	# prepare the sample 
+	prepare_sample(chemical.lower())
 
-	if error != None:
-		log.info("%s error = %.4d" % (chemical, error))
+	source = init.sensing_config.data['image_source'] 
+	img = get_img(source)
+
+	if None == img.any():
+		log.error("Invalid image.")
+		return -1
+
+	# get interpolated value 
+	sensed_value = None
+
+	if 'pH' == chemical:
+		log.info("Interpolating pH using hue values.")
+		sensed_value = interpolate_chemical_property_from_img_hue(chemical, img)
+	else:
+		log.warning("Interpolating unknown chemical.")
+
+	error = None
+
+	if None != sensed_value:
+		desired_value = init.control_config.data['ph_target']
+		log.info("Desired value = " + str(desired_value))
+		log.info("Sensed value = " + str(sensed_value))
+
+		error = float(desired_value) - float(sensed_value)
+
+		log.info("%s error = %.4f" % (chemical, error))
+	else:
+		log.warning("No sensed value.")
+		return -2
+
+	# convert the error into grams released 
+	spa_volume_gal = init.system_config.data['spa_volume_gal']
+
+	chemical_type, chemical_quantity_g = get_release_quantity_g(chemical, spa_volume_gal, error)
 
 	# release appropriate amount of chemical into system
-	release_chemical(chemical, 0)
+	if None != chemical_type and chemical_quantity_g > 0:
+		release_chemical(chemical_type, chemical_quantity_g)
 
-	# let jets and main line pump mix chemicals into spa 
-	log.info("Mixing chemicals for %d seconds..." % spa_mix_time_s)
-	time.sleep(spa_mix_time_s)
+		# let jets and main line pump mix chemicals into spa 
+		log.info("Mixing chemicals for %d seconds..." % spa_mix_time_s)
+		time.sleep(spa_mix_time_s)
 
-	# Turn off spa jets 
-	init.hardware.set_pin('spa_jets', False)
+		# Turn off spa jets 
+		init.hardware.set_pin('spa_jets', False)
 
 	# Turn off main line pump
 	init.hardware.set_pin('main_line_pump', False)
 
+
+def get_release_quantity_g(chemical, spa_volume_gal, error):
+	""" Get what chemical should be released and the quantity of 
+	the chemical that should be released from this error and spa size. 
+	Returns chemical_type, chemical_quantity (in grams)
+	"""
+
+	if 'pH' == chemical:
+		log.info("Determining chemical release for pH error %.4f" % error)
+		ph_gain = init.control_config.data['ph_gain']
+
+		# if the error is less than 0.2, release none
+		if 0.2 > abs(error): 
+			log.info("No chemicals needed. pH balanced.")
+			return None, 0
+		elif error > 0:
+			# the error is > 0, the desired is higher than the sensed add pH up
+			chemical_type = 'ph_up'
+			chemical_quantity = spa_volume_gal * abs(error) * ph_gain
+
+			return chemical_type, chemical_quantity
+		elif error < 0:
+			# the error is < 0, the desired is less than the sensed, add pH down
+			chemical_type = 'ph_down'
+			chemical_quantity = spa_volume_gal * abs(error) * ph_gain
+
+			return chemical_type, chemical_quantity
+	else:
+		log.warning("System not calibrated to release %s" % chemical)
+
+	# by default return chemical type None with quantity 0 grams
+	return None, 0

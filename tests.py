@@ -32,7 +32,7 @@ class TestSensingPh(unittest.TestCase):
 		init.init(arg_vals['verbose'])
 
 	def run_test(self, test_value, test_file):
-		img = get_img('file', test_file) 
+		img = get_img('file', test_file)
 		value = interpolate_chemical_property_from_img_hue('pH', img)
 
 		print("[TEST]: Testing %f = %f" % (value, test_value))
