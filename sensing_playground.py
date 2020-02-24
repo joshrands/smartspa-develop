@@ -133,6 +133,9 @@ def create_scale_hue_graph(chemical):
         values.append(float(key))
 
         h,s,v = colorsys.rgb_to_hsv(*(scale[key]))
+        if h > 0.5:
+            h -= 1
+            
         hues.append(h)
         sat.append(s)
         val.append(v)

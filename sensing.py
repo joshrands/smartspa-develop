@@ -17,6 +17,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from os import path
 import numpy.linalg as linalg
+import colorsys
 
 import init
 from helpers import get_distance_between_points_3d, running_on_rpi
@@ -30,6 +31,76 @@ else:
     import pygame
     import pygame.camera
 
+
+def interpolate_chemical_property_from_img_hue(chemical, img):
+	r,g,b = get_average_rgb_from_img(img)
+	
+	scale = get_scale_map(chemical)
+
+	# convert r,g,b to h,s,v 
+	h,s,v = colorsys.rgb_to_hsv(r,g,b)
+
+	if h > 0.5:
+		h -= 1
+
+	# get the distance from each point in the scale (converted to a hue)
+	sorted_keys = sorted(scale.keys())
+	distances = []
+	hues = []
+
+	for key in sorted_keys:
+		rgb = scale[key]
+		hue,sat,val = colorsys.rgb_to_hsv(*(rgb))
+
+		if hue > 0.5:
+			hue -= 1
+
+		dist = abs(h - hue)
+		distances.append(dist)
+		hues.append(hue)
+
+	closest_index = distances.index(min(distances))
+
+	# interpolate 
+	# if we are the lowest index in the example scale, figure out if it is less than lowest
+	# or inbetween lowest and second lowest 
+	if (0 == closest_index):
+
+		if (distances[0] < distances[1]):
+			# we are less than minimum
+			print("[WARNING]: Value outside of scale range.")
+
+		low_index = 0
+		high_index = 1
+	elif (len(sorted_keys) - 1 == closest_index):
+		low_index = len(sorted_keys) - 2
+		high_index = closest_index
+	else:
+		# check high and low 
+		low_distance = distances[closest_index - 1]
+		high_distance = distances[closest_index + 1]
+		if (low_distance < high_distance):
+			low_index = closest_index - 1
+			high_index = closest_index
+		else:
+			low_index = closest_index
+			high_index = closest_index + 1
+
+	# interpolate the new value 
+	high_hue,_,_ = colorsys.rgb_to_hsv(*(scale[sorted_keys[high_index]]))
+	low_hue,_,_ = colorsys.rgb_to_hsv(*(scale[sorted_keys[low_index]]))
+
+	h_distance = high_hue - h
+	low_distance = high_hue - low_hue
+
+	ratio = h_distance / low_distance
+
+	# get the difference between high and low chemical property 
+	range_difference = float(sorted_keys[high_index]) - float(sorted_keys[low_index])
+
+	interpolated_value = float(sorted_keys[high_index]) - range_difference * ratio
+
+	return interpolated_value
 
 def interpolate_chemical_property_from_img_rgb(chemical, img):
 	r,g,b = get_average_rgb_from_img(img)

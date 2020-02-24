@@ -10,10 +10,10 @@ import unittest
 
 import init 
 from sensing_playground import interpolate_rgb_values
-from sensing import get_img, interpolate_chemical_property_from_img_rgb, visualize, get_average_rgb_from_img, get_scale_map
+from sensing import get_img, interpolate_chemical_property_from_img_rgb, visualize, get_average_rgb_from_img, get_scale_map, interpolate_chemical_property_from_img_hue
 
-test_accuracy = 0.2
-visualize_fails = False
+test_accuracy = 0.3
+visualize_fails = True
 
 class TestTesting(unittest.TestCase):
 
@@ -63,9 +63,9 @@ class TestSensingPh(unittest.TestCase):
 		file_name = 'unit/7,0.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
-	def test_7_1(self):
-		test_value = 7.1
-		file_name = 'unit/7,1.png'
+	def test_7_2(self):
+		test_value = 7.2
+		file_name = 'unit/7,2.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_5(self):
@@ -96,6 +96,11 @@ class TestSensingPh(unittest.TestCase):
 	def test_8_2(self):
 		test_value = 8.2
 		file_name = 'unit/8,2.png'
+		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
+
+	def test_7_6(self):
+		test_value = 7.6
+		file_name = 'unit/7,6.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 if __name__ == '__main__':

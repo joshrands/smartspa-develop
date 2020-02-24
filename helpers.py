@@ -56,6 +56,8 @@ def running_on_rpi():
 
 		for line in lines:
 			if line.__contains__("Raspberry"):
+				info_file.close()
 				return True
 
+	info_file.close()
 	return False
