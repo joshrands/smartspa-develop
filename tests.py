@@ -12,7 +12,7 @@ import init
 from sensing_playground import interpolate_rgb_values
 from sensing import get_img, interpolate_chemical_property_from_img_rgb, visualize, get_average_rgb_from_img, get_scale_map, interpolate_chemical_property_from_img_hue
 
-test_accuracy = 0.3
+test_accuracy = 0.2
 visualize_fails = True
 
 class TestTesting(unittest.TestCase):
@@ -33,7 +33,7 @@ class TestSensingPh(unittest.TestCase):
 
 	def run_test(self, test_value, test_file):
 		img = get_img('file', test_file) 
-		value = interpolate_chemical_property_from_img_rgb('pH', img)
+		value = interpolate_chemical_property_from_img_hue('pH', img)
 
 		print("[TEST]: Testing %f = %f" % (value, test_value))
 
@@ -47,61 +47,36 @@ class TestSensingPh(unittest.TestCase):
 
 		return abs(value - test_value)
 
-	def test_6_5(self):
-		# read the 6.5 pH test image and classify 
-		test_value = 6.5
-		file_name = 'unit/6,5.png'
-		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
-
-	def test_6_7(self):
-		test_value = 6.7
-		file_name = 'unit/6,7.png'
-		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
-
-	def test_7_0(self):
-		test_value = 7.0
-		file_name = 'unit/7,0.png'
+	def test_6_9(self):
+		test_value = 6.9
+		file_name = 'unit/6,9.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_2(self):
-		test_value = 7.2
+		test_value = 7.2 
 		file_name = 'unit/7,2.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_5(self):
-		test_value = 7.5
+		test_value = 7.5 
 		file_name = 'unit/7,5.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
-	def test_7_7(self):
-		test_value = 7.7
-		file_name = 'unit/7,7.png'
-		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
-
-	def test_7_71(self):
-		test_value = 7.71
-		file_name = 'unit/7,71.png'
+	def test_7_6(self):
+		test_value = 7.6 
+		file_name = 'unit/7,6.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_9(self):
-		test_value = 7.9
+		test_value = 7.9 
 		file_name = 'unit/7,9.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
-	def test_8_0(self):
-		test_value = 8.0 
-		file_name = 'unit/8,0.png'
+	def test_7_35(self):
+		test_value = 7.35 
+		file_name = 'unit/7,35.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
-	def test_8_2(self):
-		test_value = 8.2
-		file_name = 'unit/8,2.png'
-		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
-
-	def test_7_6(self):
-		test_value = 7.6
-		file_name = 'unit/7,6.png'
-		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 if __name__ == '__main__':
 	unittest.main()
