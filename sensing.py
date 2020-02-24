@@ -13,8 +13,10 @@ import time
 import logging as log
 import matplotlib.image as image
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from os import path
+import numpy.linalg as linalg
 
 import init
 from helpers import get_distance_between_points_3d, running_on_rpi
@@ -27,6 +29,79 @@ if running_on_rpi():
 else:
     import pygame
     import pygame.camera
+
+
+def interpolate_chemical_property_from_img(chemical, img):
+	r,g,b = get_average_rgb_from_img(img)
+
+	scale = get_scale_map(chemical)
+
+	# get the distance from each point in the scale 
+	sorted_keys = sorted(scale.keys())
+	distances = []
+
+	for key in sorted_keys:
+		rgb = scale[key]
+		dist = get_distance_between_points_3d(rgb, [r,g,b])
+
+		distances.append(dist)
+
+	# find the closest r,g,b value 
+	closest_index = distances.index(min(distances))
+	print("Closest to " + sorted_keys[closest_index])
+
+	# find if high or low is closer 
+	low_index = 0
+	high_index = 0
+
+	# if we are the lowest index in the example scale, figure out if it is less than lowest
+	# or inbetween lowest and second lowest 
+	if (0 == closest_index):
+
+		print(distances[0], distances[1])
+		if (distances[0] < distances[1]):
+			# we are less than minimum
+			print("[WARNING]: Value outside of scale range.")
+
+		low_index = 0
+		high_index = 1
+	elif (len(sorted_keys) - 1 == closest_index):
+		low_index = len(sorted_keys) - 2
+		high_index = closest_index
+	else:
+		# check high and low 
+		low_distance = distances[closest_index - 1]
+		high_distance = distances[closest_index + 1]
+		if (low_distance < high_distance):
+			low_index = closest_index - 1
+			high_index = closest_index
+		else:
+			low_index = closest_index
+			high_index = closest_index + 1
+
+	# interpolate the new value 
+	# 1. Derive the vector between low and high index 
+	high_rgb = scale[sorted_keys[high_index]]
+	low_rgb = scale[sorted_keys[low_index]]
+
+	vector = [high_rgb[0] - low_rgb[0], high_rgb[1] - low_rgb[1], high_rgb[2] - low_rgb[2]]
+
+	# 2. Convert vector to unit vector 
+	unit_vector = vector / linalg.norm(vector)
+
+	# 3. Get projected r,g,b from unit vector dot product ((x,y,z).(a,b,c)*(a,b,c))
+	projected_rgb = (unit_vector[0]*r + unit_vector[1]*g + unit_vector[2]*b)*np.asarray([r,g,b])
+
+	# 4. Interpolate the chemical from the interpolated r,g,b
+	# get the distance from the high_rgb 
+	distance = get_distance_between_points_3d(high_rgb, projected_rgb)
+	
+	# get the difference between high and low chemical property 
+	range_difference = float(sorted_keys[high_index]) - float(sorted_keys[low_index])
+
+	interpolated_value = float(sorted_keys[high_index]) - range_difference * distance
+
+	return interpolated_value
 
 
 def get_error(chemical, vis=False):
@@ -63,7 +138,6 @@ def get_error(chemical, vis=False):
 	print("Closest to: %s" % closest_key)
 
 	# TODO: dist/error should include closest and second closest values
-	# TODO: Make a Kalman filter to estimate error?
 	return dist
 
 
@@ -239,13 +313,48 @@ def get_scale_map(chemical):
 		rgb[2] = float(rgb[2])
 		scale[split[0]] = rgb
 
+	in_file.close()
+
 	return scale
 
 
 def visualize(rgb, scale):
 	"""Visualize the scale and the final reading.
 	"""
+	# 3D Plot
+	fig = plt.figure()
+	ax = Axes3D(fig)
+    
+	red = []
+	green = []
+	blue = []
 
-	log.warning("Visualize not implemented.")
+    # turn keys into floats to sort 
+	keys = sorted([float(val) for val in list(scale.keys())])
+    # turn keys back into strings 
+	keys = [str(val) for val in keys]
+	previous_key = None 
+
+	for key in keys: 
+
+		if key == '0.0':
+			key = '0'
+
+		red.append(scale[key][0])
+		green.append(scale[key][1])
+		blue.append(scale[key][2])
+		ax.text(red[-1],green[-1],blue[-1],key)
+
+	red.append(rgb[0])
+	green.append(rgb[1])
+	blue.append(rgb[2])
+
+	ax.scatter(red,green,blue)
+
+	ax.set_xlabel("Red")
+	ax.set_ylabel("Green")
+	ax.set_zlabel("Blue")
+
+	plt.show()
 
 
