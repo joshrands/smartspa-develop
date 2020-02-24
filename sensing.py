@@ -95,7 +95,7 @@ def get_img(source, file_name=None):
 		if None == file_name: 
 			file_name = input("Enter image name: ")
 
-		img = image.imread("test/" + file_name)
+		img = image.imread("imgs/" + file_name)
 		# save image to sample.png for debugging	
 		image.imsave('raw-sample.png', img)
 
