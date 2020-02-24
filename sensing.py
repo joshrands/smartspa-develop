@@ -31,7 +31,7 @@ else:
     import pygame.camera
 
 
-def interpolate_chemical_property_from_img(chemical, img):
+def interpolate_chemical_property_from_img_rgb(chemical, img):
 	r,g,b = get_average_rgb_from_img(img)
 
 	scale = get_scale_map(chemical)
