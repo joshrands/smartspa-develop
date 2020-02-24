@@ -24,8 +24,8 @@ def release_chemical(chemical_type, chemical_quantity_grams):
     # wait time to release chemical_quantity_grams 
     release_gain = init.control_config.data['chemical_release_gain']
 
-    wait_time = release_gain
-    log.info("Waiting %d seconds to release %d grams of %s" % (wait_time, chemical_quantity_grams, chemical_type))
+    wait_time = release_gain * float((chemical_quantity_grams/1000.0))
+    log.info("Waiting %.4f seconds to release %.4f grams of %s" % (wait_time, chemical_quantity_grams, chemical_type))
     time.sleep(release_gain)
 
     # stop auger to stop releasing chemicals 

@@ -42,7 +42,8 @@ def balance_chemical(chemical, vis=False):
 		log.info("Interpolating pH using hue values.")
 		sensed_value = interpolate_chemical_property_from_img_hue(chemical, img)
 	else:
-		log.warning("Interpolating unknown chemical.")
+		log.error("Interpolating unknown chemical.")
+		return None
 
 	error = None
 
@@ -55,7 +56,7 @@ def balance_chemical(chemical, vis=False):
 
 		log.info("%s error = %.4f" % (chemical, error))
 	else:
-		log.warning("No sensed value.")
+		log.error("No sensed value.")
 		return -2
 
 	# convert the error into grams released 
@@ -106,7 +107,7 @@ def balance_chemical(chemical, vis=False):
 
 		# Turn off main line pump 
 		init.hardware.set_pin('main_line_pump', False)
-		
+
 
 def get_release_quantity_g(chemical, spa_volume_gal, error):
 	""" Get what chemical should be released and the quantity of 
@@ -135,7 +136,7 @@ def get_release_quantity_g(chemical, spa_volume_gal, error):
 
 			return chemical_type, chemical_quantity
 	else:
-		log.warning("System not calibrated to release %s" % chemical)
+		log.error("System not calibrated to release %s" % chemical)
 
 	# by default return chemical type None with quantity 0 grams
 	return None, 0

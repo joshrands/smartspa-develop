@@ -141,7 +141,7 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 
 		if (distances[0] < distances[1]):
 			# we are less than minimum
-			log.warning("[WARNING]: Value outside of scale range.")
+			log.warning("Value outside of scale range.")
 
 		low_index = 0
 		high_index = 1
@@ -229,9 +229,9 @@ def set_sample_led(light_on, LED_PIN):
 			log.info("Setting sample LED to " + str(light_on))
 			GPIO.output(LED_PIN, light_on)
 		else:
-			log.warning("LED pin set to None.")
+			log.error("LED pin set to None.")
 	else:
-		log.warning("Not running on RPi")
+		log.error("Not running on RPi")
 
 
 def get_img(source, file_name=None):
@@ -300,7 +300,7 @@ def get_img(source, file_name=None):
 
 					return img
 		else:
-			log.warning("Not running on RPi.")
+			log.error("Not running on RPi.")
 
 	else:
 		log.error("Invalid image source.")

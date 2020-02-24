@@ -61,7 +61,7 @@ class Hardware:
 				log.warning("Unknown pin type: %s" % pin_type)
 				self.PIN_TYPES[pin_number] = None
 		else:
-			log.warning("Cannot initialize pin, not running on raspberry pi.")
+			log.error("Cannot initialize pin, not running on raspberry pi.")
 
 		log.info("%s set to pin %d as type %s" % (name, pin_number, pin_type))
 
@@ -70,7 +70,7 @@ class Hardware:
 		"""Set the state of pin 'name' to state 'state'
 		"""
 		if not name in self.PINS:
-			log.warning("No pin exists for %s." % name)
+			log.error("No pin exists for %s." % name)
 			return
 
 		PIN = self.PINS[name]
@@ -81,7 +81,7 @@ class Hardware:
 
 			log.info("Set %s, pin %d, to %s" % (name, PIN, state))
 		else:
-			log.warning("Not running on RPi. Can't set pin.")
+			log.error("Not running on RPi. Can't set pin.")
 
 
 def close_main_valve_halfway():
