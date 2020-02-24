@@ -1,7 +1,8 @@
 <sensing>
 	<sample_interval_s>10</sample_interval_s>
 	<pH>true</pH>
-	<Cl>true</Cl>
-	<alkalinity>true</alkalinity>
+	<Cl>false</Cl>
+	<alkalinity>false</alkalinity>
 	<calcium>false</calcium>
+	<sensor_flush_interval_s>3</sensor_flush_interval_s>
 </sensing>

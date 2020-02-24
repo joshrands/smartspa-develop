@@ -12,6 +12,7 @@ import time
 from sensing import get_img, interpolate_chemical_property_from_img_hue, interpolate_chemical_property_from_img_rgb
 from release_chemical import release_chemical 
 from prepare_sample import prepare_sample
+from hardware_iface import close_main_valve_halfway, open_main_valve, close_main_valve
 import init
 
 # Global params
@@ -62,9 +63,39 @@ def balance_chemical(chemical, vis=False):
 
 	chemical_type, chemical_quantity_g = get_release_quantity_g(chemical, spa_volume_gal, error)
 
+	# picture processed, open reagent solenoid valve to flush system 
+	init.hardware.set_pin('reagent_solenoid_valve', True)
+
+	# close main line valve halfway to force water into sensing system
+	close_main_valve_halfway()
+
+	# wait for reagent sensing system to flush out 
+	flush_interval_s = init.real_time_config.data['sensor_flush_interval_s']
+	log.info("Waiting %d seconds for sensing system to flush out." % flush_interval_s)
+	time.sleep(flush_interval_s)	
+
+	# turn off main line pump
+	init.hardware.set_pin('main_line_pump', False)
+
+	# close main line valve all the way 
+	close_main_valve()
+
+	# system ready to release chemicals!
+	log.info("System ready for chemical granule release.")
+
 	# release appropriate amount of chemical into system
 	if None != chemical_type and chemical_quantity_g > 0:
+		# release the chemicals 
 		release_chemical(chemical_type, chemical_quantity_g)
+
+		# open main line valve to flow water 
+		open_main_valve()
+
+		# turn on main line pump 
+		init.hardware.set_pin('main_line_pump', True)
+
+		# turn on the spa jets to help mix chemicals 
+		init.hardware.set_pin('spa_jets', True)
 
 		# let jets and main line pump mix chemicals into spa 
 		log.info("Mixing chemicals for %d seconds..." % spa_mix_time_s)
@@ -73,9 +104,9 @@ def balance_chemical(chemical, vis=False):
 		# Turn off spa jets 
 		init.hardware.set_pin('spa_jets', False)
 
-	# Turn off main line pump
-	init.hardware.set_pin('main_line_pump', False)
-
+		# Turn off main line pump 
+		init.hardware.set_pin('main_line_pump', False)
+		
 
 def get_release_quantity_g(chemical, spa_volume_gal, error):
 	""" Get what chemical should be released and the quantity of 

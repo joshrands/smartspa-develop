@@ -7,35 +7,18 @@ Email: joshrands1@gmail.com
 """
 
 import logging as log
+import time
+
 import init
 from helpers import running_on_rpi
-import time
+from hardware_iface import open_main_valve, close_main_valve_halfway
 
 if running_on_rpi():
 	import RPi.GPIO as GPIO
 
 # Global params for timing stuff
-close_halfway_time_s = 1
 test_chamber_fill_time_s = 4
 reagent_drip_time_s = 1
-
-
-def close_main_valve_halfway():
-	"""Use a timer to close the main valve halfway
-	"""
-	# close the valve by powering the 'close' pin
-	init.hardware.set_pin('close_main_line_valve', True)
-	time.sleep(close_halfway_time_s)
-	init.hardware.set_pin('close_main_line_valve', False)
-
-
-def open_main_valve():
-	"""Use a timer to open the main valve all the way 
-	"""
-	# open the valve by powering the 'open' pin
-	init.hardware.set_pin('open_main_line_valve', True)
-	time.sleep(close_halfway_time_s)
-	init.hardware.set_pin('open_main_line_valve', False)
 
 
 def mix_reagent():
@@ -55,7 +38,9 @@ def prepare_sample(chemical):
 	"""
 
 	# Turn on spa jets 
-	init.hardware.set_pin('spa_jets', True)
+	# TODO: Do we want to turn on the spa jets here? 
+	log.warning("NOT TURNING ON SPA JETS.")
+#	init.hardware.set_pin('spa_jets', True)
 
 	# Turn on main line pump
 	init.hardware.set_pin('main_line_pump', True)
@@ -91,4 +76,4 @@ def prepare_sample(chemical):
 
 	# Done! 
 
-	log.info("Sample not prepared!")
+	log.info("Sample prepared!")

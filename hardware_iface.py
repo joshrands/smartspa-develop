@@ -7,10 +7,16 @@ Email: joshrands1@gmail.com
 """
 
 import logging as log
+import time 
+
 from helpers import parse_xml, running_on_rpi
+import init
 
 if running_on_rpi():
 	import RPi.GPIO as GPIO
+
+# Global variables 
+close_halfway_time_s = 1
 
 
 class Hardware:
@@ -76,3 +82,57 @@ class Hardware:
 			log.info("Set %s, pin %d, to %s" % (name, PIN, state))
 		else:
 			log.warning("Not running on RPi. Can't set pin.")
+
+
+def close_main_valve_halfway():
+	"""Use a timer to close the main valve halfway
+	"""
+	# close the valve by powering the 'close' pin
+	init.hardware.set_pin('close_main_line_valve', True)
+	time.sleep(close_halfway_time_s)
+	init.hardware.set_pin('close_main_line_valve', False)
+
+
+def open_main_valve():
+	"""Use a timer to open the main valve all the way 
+	"""
+	# open the valve by powering the 'open' pin
+	init.hardware.set_pin('open_main_line_valve', True)
+	time.sleep(close_halfway_time_s)
+	init.hardware.set_pin('open_main_line_valve', False)
+
+
+def close_main_valve():
+	"""Use a timer to close the main valve all the way 
+	"""
+	# close the valve by powering the 'close' pin
+	init.hardware.set_pin('close_main_line_valve', True)
+	time.sleep(close_halfway_time_s*2)
+	init.hardware.set_pin('close_main_line_valve', False)
+
+
+def open_chemical_dispensing_doors():
+	"""Drive the chemical dispensing doors servo to open them
+	and allow chemicals to drop into the water.
+	"""
+	log.warning("Chemical dispensing door servo open not implemented.")
+
+
+def close_chemical_dispensing_doors():
+	"""Drive the chemical dispensing doors servo to close them
+	"""
+	log.warning("Chemical dispensing door servo close not implemented.")
+
+
+def spin_chemical_release_auger():
+	"""Turn on the stepper motor to spin the auger and release
+	chemicals into the water.
+	"""
+	log.warning("Auger stepper motor not implemented.")
+
+
+def stop_chemical_release_auger():
+	"""Stop the auger stepper motor.
+	"""
+	log.warning("Auger stepper motor not implemented.")
+

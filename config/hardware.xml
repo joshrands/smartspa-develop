@@ -7,4 +7,7 @@
 	<open_main_line_valve_pin>19</open_main_line_valve_pin>
 	<close_main_line_valve_pin>21</close_main_line_valve_pin>
 	<sensing_led_pin>37</sensing_led_pin>
+	<open_dispensing_doors_pin>22</open_dispensing_doors_pin>
+	<close_dispensing_doors_pin>23</close_dispensing_doors_pin>
+	<auger_stepper_motor_pin>24</auger_stepper_motor_pin>
 </hardware>
