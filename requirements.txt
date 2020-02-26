@@ -5,5 +5,6 @@ numpy==1.18.1
 pygame==1.9.6
 pyparsing==2.4.6
 python-dateutil==2.8.1
-RPi.GPIO==0.7.0
 six==1.14.0
+scikit-image==0.16.2
+sk-video==1.1.10

@@ -30,6 +30,7 @@ class Hardware:
 		"""
 		self.PINS = {}
 		self.PIN_TYPES = {}
+		self.SERVOS = {}
 
 		# configure raspberry pi to BOARD mode 
 		# this means all pin numbers should be the true pin number on the pi
@@ -57,6 +58,10 @@ class Hardware:
 			elif pin_type == 'INPUT':
 				GPIO.setup(pin_number, GPIO.IN)
 				self.PIN_TYPES[pin_number] = pin_type
+			elif pin_type == 'SERVO':
+				# TODO: Add interface for setting frequency of servo 
+				self.PIN_TYPES[pin_number] = pin_type 
+				self.SERVOS[pin_number] = ServoMotor(pin_number)
 			else:
 				log.warning("Unknown pin type: %s" % pin_type)
 				self.PIN_TYPES[pin_number] = None
@@ -77,11 +82,50 @@ class Hardware:
 
 		if running_on_rpi():
 			if self.PIN_TYPES[PIN] == 'OUTPUT':
+				# for an output, the state is on or off (true or false)
 				GPIO.output(PIN, state)
+			elif self.PIN_TYPES[PIN] == 'SERVO':
+				# for a servo, the state is the desired angle
+				self.SERVOS[PIN].setAngle(state)
 
 			log.info("Set %s, pin %d, to %s" % (name, PIN, state))
 		else:
 			log.error("Not running on RPi. Can't set pin.")
+
+
+class ServoMotor:
+	"""ServoMotor class.
+
+	Creates an interface for driving a servo motor to specific angles.
+	"""
+
+	default_frequency_hz = 2.5
+
+	def __init__(self, pin, frequency_hz=50):
+		"""Initialize a servo motor for a specific pin and frequency.
+		"""
+		self.pin = pin
+		self.freq_hz = frequency_hz
+
+		# initialize the servo with GPIO
+		GPIO.setup(self.pin, GPIO.OUT)
+
+		# setup pwm
+		self.pwm = GPIO.PWM(self.pin, frequency_hz)
+		self.pwm.start(default_frequency_hz)
+
+		log.info("Initialized ServoMotor at frequency %d for pin %d" % (frequency_hz, pin))
+
+
+	def setAngle(self, desired_angle_deg):
+		"""Set the angle of this servo to a desired angle in degrees.
+		"""
+		ratio = desired_angle_deg / 180.0
+		min_angle_freq_hz = 2.5
+		max_angle_freq_hz = 12.5
+
+		# TODO: Test this 
+		self.pwm.ChangeDutyCycle(min_angle_freq_hz + max_angle_freq_hz * ratio)
 
 
 def close_main_valve_halfway():

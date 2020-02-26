@@ -11,6 +11,7 @@ import unittest
 import init 
 from sensing_playground import interpolate_rgb_values
 from sensing import get_img, interpolate_chemical_property_from_img_rgb, visualize, get_average_rgb_from_img, get_scale_map, interpolate_chemical_property_from_img_hue
+from helpers import running_on_rpi
 
 test_accuracy = 0.2
 visualize_fails = True
@@ -23,6 +24,18 @@ class TestTesting(unittest.TestCase):
 	def test_not_equal(self):
 		self.assertNotEqual(True, False)
 
+
+class TestSensingHardware(unittest.TestCase):
+
+	def setUpClass():
+		arg_vals = init.get_args()
+
+		init.init(arg_vals['verbose'])
+
+	def test_reagent_solenoid_valve(self):
+		self.assertTrue(running_on_rpi())
+
+		# TODO: Test opening solenoid valve with visual feedback 
 
 class TestSensingPh(unittest.TestCase):
 

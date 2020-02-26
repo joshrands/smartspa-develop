@@ -288,11 +288,10 @@ def get_img(source, file_name=None):
 
 					# adjust resolution for easier data processing 
 					camera.resolution = (width, height)
-					# TODO: Double check bgr is okay or try rgb again...
 					camera.capture(stream, format='rgb') # was 'bgr'
-          # At this point the image is available as stream.array
+					# At this point the image is available as stream.array
 					img = stream.array
-          # save to file
+					# save to file
 					camera.capture('raw-sample.png')
 
 					# Turn off LED 
