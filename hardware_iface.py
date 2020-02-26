@@ -31,6 +31,7 @@ class Hardware:
 		self.PINS = {}
 		self.PIN_TYPES = {}
 		self.SERVOS = {}
+		self.STEPPERS = {}
 
 		# configure raspberry pi to BOARD mode 
 		# this means all pin numbers should be the true pin number on the pi
@@ -87,6 +88,13 @@ class Hardware:
 			elif self.PIN_TYPES[PIN] == 'SERVO':
 				# for a servo, the state is the desired angle
 				self.SERVOS[PIN].setAngle(state)
+			elif self.PIN_TYPES[PIN] == 'STEPPER':
+				# for a stepper, the state is the desired angle 
+				# positive is clockwise, negative is counterclockwise 
+				if state >= 0: 
+					self.STEPPERS[PIN].turnClockwise(abs(state))
+				else:
+					self.STEPPERS[PIN].turnCounterClockwise(abs(state))
 
 			log.info("Set %s, pin %d, to %s" % (name, PIN, state))
 		else:
@@ -96,7 +104,7 @@ class Hardware:
 class ServoMotor:
 	"""ServoMotor class.
 
-	Creates an interface for driving a servo motor to specific angles.
+	An interface for driving a servo motor to specific angles.
 	"""
 
 	default_frequency_hz = 2.5
@@ -125,7 +133,77 @@ class ServoMotor:
 		max_angle_freq_hz = 12.5
 
 		# TODO: Test this 
-		self.pwm.ChangeDutyCycle(min_angle_freq_hz + max_angle_freq_hz * ratio)
+		if running_on_rpi():
+			self.pwm.ChangeDutyCycle(min_angle_freq_hz + max_angle_freq_hz * ratio)
+		else:
+			log.warning("Cannot set angle of servo to %d, not running on RPi." % desired_angle_deg)
+
+
+class StepperMotor:
+	"""StepperMotor class.
+
+	An interface for driving stepper motors a specific number of rotations.
+	"""
+
+	def __init__(self, control_pins):
+		"""Initialize a stepper motor for 4 control pins.
+		"""
+		self.control_pins = control_pins
+
+		for pin in self.control_pins:
+			GPIO.setup(pin, GPIO.OUT)
+			GPIO.output(pin, False)
+
+		# sequence of driving control pins for a halfstep
+		self.halfstep_seq = [
+			[1,0,0,0],
+			[1,1,0,0],
+			[0,1,0,0],
+			[0,1,1,0],
+			[0,0,1,0],
+			[0,0,1,1],
+			[0,0,0,1],
+			[1,0,0,1]
+		]
+
+		# I'm not sure if 512 is universal or just my experience 
+		self.complete_revolution_steps = 512
+		# time inbetween steps 
+		self.step_time_s = 0.001
+
+
+	def turnClockwise(self, degrees):
+		"""Drive the stepper motor clockwise 'degrees'
+		"""
+		# convert degrees to steps 
+		ratio = degrees / 360.0
+		steps = int(self.complete_revolution_steps * ratio)
+
+		if running_on_rpi():
+			for i in range(steps):
+				for halfstep in range(8):
+					for pin in self.control_pins:
+						GPIO.output(self.control_pins[pin], halfstep[7 - halfstep][pin])
+					time.sleep(self.step_time_s)
+		else:
+			log.warning("Cannot turn stepper motor clockwise %d degrees, not running on RPi." % degrees)
+
+
+	def turnCounterClockwise(self, degrees):
+		"""Drive the stepper motor counterclockwise 'degrees'
+		"""
+		# convert degrees to steps 
+		ratio = degrees / 360.0
+		steps = int(self.complete_revolution_steps * ratio)
+
+		if running_on_rpi():
+			for i in range(steps):
+				for halfstep in range(8):
+					for pin in self.control_pins:
+						GPIO.output(self.control_pins[pin], halfstep[halfstep][pin])
+					time.sleep(self.step_time_s)
+		else:
+			log.warning("Cannot turn stepper motor counter-clockwise %d degrees, not running on RPi." % degrees)
 
 
 def close_main_valve_halfway():
