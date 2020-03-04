@@ -16,13 +16,12 @@ from helpers import running_on_rpi
 test_accuracy = 0.2
 visualize_fails = True
 
+folder = None
+
 class TestTesting(unittest.TestCase):
 
 	def test_equal(self):
 		self.assertEqual(True, True)
-
-	def test_not_equal(self):
-		self.assertNotEqual(True, False)
 
 
 class TestSensingHardware(unittest.TestCase):
@@ -33,18 +32,23 @@ class TestSensingHardware(unittest.TestCase):
 		init.init(arg_vals['verbose'])
 
 	def test_reagent_solenoid_valve(self):
-		self.assertTrue(running_on_rpi())
+		pass
 
-		# TODO: Test opening solenoid valve with visual feedback 
 
 class TestSensingPh(unittest.TestCase):
 
 	def setUpClass():
+		global folder 
+		folder = 'pH'
+
 		arg_vals = init.get_args()
 
 		init.init(arg_vals['verbose'])
 
-	def run_test(self, test_value, test_file):
+	def run_test(self, test_value, image_file):
+		global folder 
+
+		test_file = 'unit/' + folder + '/' + image_file
 		img = get_img('file', test_file)
 		value = interpolate_chemical_property_from_img_hue('pH', img)
 
@@ -62,32 +66,32 @@ class TestSensingPh(unittest.TestCase):
 
 	def test_6_9(self):
 		test_value = 6.9
-		file_name = 'unit/6,9.png'
+		file_name = '6,9.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_2(self):
 		test_value = 7.2 
-		file_name = 'unit/7,2.png'
+		file_name = '7,2.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_5(self):
 		test_value = 7.5 
-		file_name = 'unit/7,5.png'
+		file_name = '7,5.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_6(self):
 		test_value = 7.6 
-		file_name = 'unit/7,6.png'
+		file_name = '7,6.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_9(self):
 		test_value = 7.9 
-		file_name = 'unit/7,9.png'
+		file_name = '7,9.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 	def test_7_35(self):
 		test_value = 7.35 
-		file_name = 'unit/7,35.png'
+		file_name = '7,35.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 
