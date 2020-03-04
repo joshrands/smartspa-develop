@@ -217,11 +217,11 @@ if __name__ == '__main__':
 
     init.init(arg_vals['verbose'])
 
-    create_interpolated_rgb_graph('pH', 20, False)
+    create_interpolated_rgb_graph('Cl', 20, False)
 #    create_interpolated_rgb_graph('alkalinity', 20, False)
 #    create_interpolated_rgb_graph('Cl', 20, False)
 
-    create_scale_hue_graph('pH')
+    create_scale_hue_graph('Cl')
 
     test_values = [['pH',6.8],['pH',7.0],['pH',7.3],['pH',7.4]]
 

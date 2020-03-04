@@ -22,9 +22,9 @@ def parse_xml(file_name):
 	count = 0
 	for child in root:
 
-		if (root[count].text == 'true'):
+		if (root[count].text == 'true' or root[count].text == 'True'):
 			data[child.tag] = True
-		elif (root[count].text == 'false'):
+		elif (root[count].text == 'false' or root[count].text == 'False'):
 			data[child.tag] = False 
 		elif (True == (root[count].text).isdigit()):
 			data[child.tag] = int(root[count].text)

@@ -13,10 +13,10 @@ from sensing_playground import interpolate_rgb_values
 from sensing import get_img, interpolate_chemical_property_from_img_rgb, visualize, get_average_rgb_from_img, get_scale_map, interpolate_chemical_property_from_img_hue
 from helpers import running_on_rpi
 
+# Global parameters
 test_accuracy = 0.2
 visualize_fails = True
-
-folder = None
+chemical_property = None
 
 class TestTesting(unittest.TestCase):
 
@@ -31,6 +31,7 @@ class TestSensingHardware(unittest.TestCase):
 
 		init.init(arg_vals['verbose'])
 
+
 	def test_reagent_solenoid_valve(self):
 		pass
 
@@ -38,19 +39,17 @@ class TestSensingHardware(unittest.TestCase):
 class TestSensingPh(unittest.TestCase):
 
 	def setUpClass():
-		global folder 
-		folder = 'pH'
-
-		arg_vals = init.get_args()
-
-		init.init(arg_vals['verbose'])
+		global chemical_property 
+		global test_accuracy
+		chemical_property = 'pH'
+		test_accuracy = 0.2
 
 	def run_test(self, test_value, image_file):
-		global folder 
+		global chemical_property 
 
-		test_file = 'unit/' + folder + '/' + image_file
+		test_file = 'unit/' + chemical_property + '/' + image_file
 		img = get_img('file', test_file)
-		value = interpolate_chemical_property_from_img_hue('pH', img)
+		value = interpolate_chemical_property_from_img_hue(chemical_property, img)
 
 		print("[TEST]: Testing %f = %f" % (value, test_value))
 
@@ -59,7 +58,7 @@ class TestSensingPh(unittest.TestCase):
 		except Exception:
 			if visualize_fails:
 				r,g,b = get_average_rgb_from_img(img)
-				scale = get_scale_map('pH')
+				scale = get_scale_map(chemical_property)
 				visualize([r,g,b], scale)
 
 		return abs(value - test_value)
@@ -95,5 +94,42 @@ class TestSensingPh(unittest.TestCase):
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 
+class TestSensingCl(unittest.TestCase):
+
+	def setUpClass():
+		global chemical_property 
+		global test_accuracy
+		chemical_property = 'Cl'
+		test_accuracy = 0.5
+
+	def run_test(self, test_value, image_file):
+		global chemical_property 
+
+		test_file = 'unit/' + chemical_property + '/' + image_file
+		img = get_img('file', test_file)
+		value = interpolate_chemical_property_from_img_hue(chemical_property, img)
+
+		print("[TEST]: Testing %f = %f" % (value, test_value))
+
+		try:
+			self.assertLess(abs(value - test_value), test_accuracy)
+		except Exception:
+			if visualize_fails:
+				r,g,b = get_average_rgb_from_img(img)
+				scale = get_scale_map(chemical_property)
+				visualize([r,g,b], scale)
+
+		return abs(value - test_value)
+
+	def test_1_0(self):
+		test_value = 1.0 
+		file_name = '1,0.png'
+		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
+
+
 if __name__ == '__main__':
+	arg_vals = init.get_args()
+
+	init.init(arg_vals['verbose'])
+
 	unittest.main()
