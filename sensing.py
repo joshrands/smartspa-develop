@@ -159,6 +159,8 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 			low_index = closest_index
 			high_index = closest_index + 1
 
+	log.info("High: %s, Low: %s" % (sorted_keys[high_index], sorted_keys[low_index]))
+
 	# interpolate the new value 
 	# 1. Derive the vector between low and high index 
 	high_rgb = scale[sorted_keys[high_index]]
@@ -179,44 +181,9 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 	# get the difference between high and low chemical property 
 	range_difference = float(sorted_keys[high_index]) - float(sorted_keys[low_index])
 
-	interpolated_value = float(sorted_keys[high_index]) - range_difference * distance
+	interpolated_value = float(sorted_keys[low_index]) + range_difference * distance
 
 	return interpolated_value
-
-"""
-def get_error(chemical, vis=False):
-	DEPRECATED. DO NOT USE.
-	Get the error for a given chemical 
-
-	prepare_sample(chemical.lower())
-
-	source = init.sensing_config.data['image_source'] 
-	img = get_img(source)
-
-	if None == img:
-		log.error("Invalid image.")
-		return None
-
-	r,g,b = get_average_rgb_from_img(img)
-
-	scale = get_scale_map(chemical)
-
-	if vis:
-		visualize([r,g,b], scale)
-
-	# get the distance from each point in the scale 
-	closest = 255
-	closest_key = ""
-	for key in scale:
-		rgb = scale[key]
-		dist = get_distance_between_points_3d(rgb, [r,g,b])
-
-		if dist < closest:
-			closest = dist
-			closest_key = key
-
-	return dist
-"""
 
 
 def set_sample_led(light_on, LED_PIN):

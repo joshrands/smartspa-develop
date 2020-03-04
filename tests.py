@@ -14,9 +14,11 @@ from sensing import get_img, interpolate_chemical_property_from_img_rgb, visuali
 from helpers import running_on_rpi
 
 # Global parameters
-test_accuracy = 0.2
-visualize_fails = True
+visualize_fails = False
+test_accuracy = None
 chemical_property = None
+# test a specific chemical
+test_chemical = None
 
 class TestTesting(unittest.TestCase):
 
@@ -30,7 +32,6 @@ class TestSensingHardware(unittest.TestCase):
 		arg_vals = init.get_args()
 
 		init.init(arg_vals['verbose'])
-
 
 	def test_reagent_solenoid_valve(self):
 		pass
@@ -107,7 +108,7 @@ class TestSensingCl(unittest.TestCase):
 
 		test_file = 'unit/' + chemical_property + '/' + image_file
 		img = get_img('file', test_file)
-		value = interpolate_chemical_property_from_img_hue(chemical_property, img)
+		value = interpolate_chemical_property_from_img_rgb(chemical_property, img)
 
 		print("[TEST]: Testing %f = %f" % (value, test_value))
 
@@ -126,10 +127,35 @@ class TestSensingCl(unittest.TestCase):
 		file_name = '1,0.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
+	def test_0_5(self):
+		test_value = 0.5 
+		file_name = '0,5.png'
+		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
+
+	def test_2_0(self):
+		test_value = 2.0 
+		file_name = '2,0.png'
+		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
+
+	def test_3_0(self):
+		test_value = 3.0 
+		file_name = '3,0.png'
+		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
+
+	def test_5_0(self):
+		test_value = 5.0 
+		file_name = '5,0.png'
+		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
+
 
 if __name__ == '__main__':
 	arg_vals = init.get_args()
 
 	init.init(arg_vals['verbose'])
 
-	unittest.main()
+	if None == test_chemical:
+		unittest.main()
+	else:	
+		cl_test = unittest.TestSuite()
+		cl_test.addTest(TestSensingCl('test_1_0'))
+		unittest.TextTestRunner().run(cl_test)
