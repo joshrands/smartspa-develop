@@ -211,23 +211,52 @@ def visualize_interpolation(chemical, actual_rgb, low_rgb, high_rgb):
     plt.title(chemical + ' ' + str(low_rgb[0]) + ',' + str(actual_rgb[0]) + ',' + str(high_rgb[0]))
     plt.show()
 
+
+def visualize_scale(chemical):
+    scale = get_scale_map(chemical)
+
+    # create palette of rgb values 
+    palette = [] 
+    indices = [[]]
+    index = 0
+    for key in sorted(scale.keys()):
+        #np.append(palette, scale[key])
+        palette.append(scale[key])
+        indices[0].append(index)
+        index += 1
+
+    print(indices)
+    palette = np.array(palette)
+    indices = np.array(indices) 
+
+    io.imshow(palette[indices])
+    plt.title(chemical + " scale") 
+    plt.savefig('./research/' + chemical + '/scale.png')
+    plt.show()
+
+
 if __name__ == '__main__':
 
     arg_vals = init.get_args()
 
     init.init(arg_vals['verbose'])
 
-    create_interpolated_rgb_graph('Cl', 20, False)
+    visualize_scale('alkalinity')
+    visualize_scale('Cl_img')
+    visualize_scale('pH')
+
+#    create_interpolated_rgb_graph('Cl', 20, False)
 #    create_interpolated_rgb_graph('alkalinity', 20, False)
 #    create_interpolated_rgb_graph('Cl', 20, False)
 
-    create_scale_hue_graph('Cl')
+#    create_scale_hue_graph('Cl_img')
 
-    test_values = [['pH',6.8],['pH',7.0],['pH',7.3],['pH',7.4]]
+#    pH_test_values = [['pH',6.8],['pH',7.0],['pH',7.3],['pH',7.4]]
+#    test_values = [['Cl',0.75],['Cl',1.5],['Cl',2.5],['Cl',4.0]]
 
-    for value_pair in test_values:
-        actual_rgb, low_rgb, high_rgb = interpolate_rgb_values(value_pair[0], value_pair[1])
-        visualize_interpolation('pH', actual_rgb, low_rgb, high_rgb)
+#    for value_pair in test_values:
+#        actual_rgb, low_rgb, high_rgb = interpolate_rgb_values(value_pair[0], value_pair[1])
+#        visualize_interpolation('Cl', actual_rgb, low_rgb, high_rgb)
 
 
 #    create_scale_hue_graph('Cl')

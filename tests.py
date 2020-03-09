@@ -100,7 +100,7 @@ class TestSensingCl(unittest.TestCase):
 	def setUpClass():
 		global chemical_property 
 		global test_accuracy
-		chemical_property = 'Cl'
+		chemical_property = 'Cl_img' # currently testing Cl_img until a better picture is taken
 		test_accuracy = 0.5
 
 	def run_test(self, test_value, image_file):
