@@ -9,7 +9,8 @@ Email: joshrands1@gmail.com
 import logging as log
 import time
 
-from sensing import get_img, interpolate_chemical_property_from_img_hue, interpolate_chemical_property_from_img_rgb
+from sensing import Metric, get_img 
+from sensing import interpolate_chemical_property_from_img_linear, interpolate_chemical_property_from_img_rgb
 from release_chemical import release_chemical 
 from prepare_sample import prepare_sample
 from hardware_iface import close_main_valve_halfway, open_main_valve, close_main_valve
@@ -40,7 +41,7 @@ def balance_chemical(chemical, vis=False):
 
 	if 'pH' == chemical:
 		log.info("Interpolating pH using hue values.")
-		sensed_value = interpolate_chemical_property_from_img_hue(chemical, img)
+		sensed_value = interpolate_chemical_property_from_img_linear(chemical, img, Metric.HUE)
 	else:
 		log.error("Interpolating unknown chemical.")
 		return None

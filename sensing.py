@@ -33,6 +33,8 @@ else:
 
 
 class Metric(Enum):
+	""" Enum for different metrics we can use to interpolate from.
+	"""
 	RED = 0
 	GREEN = 1
 	BLUE = 2
@@ -40,6 +42,7 @@ class Metric(Enum):
 	SAT = 4
 	VAL = 5
 	RGB = 6
+	HSV = 7
 
 def interpolate_chemical_property_from_img_linear(chemical, img, interpolation_metric):
 	""" Interpolate the value of a chemical property using
@@ -47,7 +50,6 @@ def interpolate_chemical_property_from_img_linear(chemical, img, interpolation_m
 	"""
 
 	index = interpolation_metric.value
-	print(index)
 
 	r,g,b = get_average_rgb_from_img(img)
 	
@@ -328,8 +330,15 @@ def get_average_rgb_from_img(img):
 	clean_r = r
 	clean_g = g
 	clean_b = b
+	iteration = 1
 	while outlier:
-    # look at data of image
+		# visualize rgb points 
+		if init.system_config.data['visualize_rgb'] == True:
+			# 3D Plot
+			plot_point_cloud([clean_r,clean_g,clean_b], ("Iteration " + str(iteration)))
+		iteration += 1
+
+    	# look at data of image
 		r_mean = np.mean(np.array(clean_r))
 		r_std = np.std(np.array(clean_r))
 		g_mean = np.mean(np.array(clean_g))
@@ -388,6 +397,21 @@ def get_scale_map(chemical):
 	in_file.close()
 
 	return scale
+
+
+def plot_point_cloud(points, title=None):
+	""" Visualize a 3d point cloud.
+	"""
+	fig = plt.figure()
+	ax = Axes3D(fig)
+
+	ax.scatter(points[0],points[1],points[2])
+	if title != None:
+		ax.set_title(title)
+
+	plt.savefig('./research/point_cloud.png') 
+	plt.show()
+	ax.clear()
 
 
 def visualize(rgb, scale):
