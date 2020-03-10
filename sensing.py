@@ -33,12 +33,12 @@ else:
 
 
 class Metric(Enum):
-	RED = 1
-	GREEN = 2
-	BLUE = 3
-	HUE = 4
-	SAT = 5
-	VAL = 6
+	RED = 0
+	GREEN = 1
+	BLUE = 2
+	HUE = 3
+	SAT = 4
+	VAL = 5
 
 
 def interpolate_chemical_property_from_img_linear(chemical, img, interpolation_metric):
