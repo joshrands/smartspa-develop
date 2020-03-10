@@ -7,6 +7,7 @@ Email: joshrands1@gmail.com
 """
 
 import unittest 
+from statistics import mean
 
 import init 
 from sensing_playground import interpolate_rgb_values
@@ -40,6 +41,28 @@ class TestSensingHardware(unittest.TestCase):
 
 class TestSensingProperty(unittest.TestCase):
 
+	results = {} 
+	errors = []
+
+	@classmethod
+	def tearDownClass(self):
+		""" Write testing results to a file 
+		"""
+
+		print("Average error of " + chemical_property + " = " + str(mean(self.errors)))
+
+		out_file = open("testing/" + chemical_property + "_results.txt","w") 
+
+		out_file.write(chemical_property + " Test Results\n")
+		out_file.write("average_error=" + str(mean(self.errors)) + "\n")
+
+		# write predictions 
+		out_file.write("actual=predicted\n")
+		for key in self.results.keys():
+			out_file.write("\t" + str(key) + "=" + str(self.results[key]) + "\n")
+
+		out_file.close()
+
 	def run_test(self, test_value, image_file):
 		global chemical_property 
 		global interpolation_metric
@@ -57,6 +80,8 @@ class TestSensingProperty(unittest.TestCase):
 		print("[TEST]: Testing %f = %f" % (value, test_value))
 
 		try:
+			self.errors.append(abs(value - test_value))
+			self.results[test_value] = value
 			self.assertLess(abs(value - test_value), test_accuracy)
 		except Exception:
 			if visualize_fails:
@@ -117,6 +142,7 @@ class TestSensingCl(TestSensingProperty):
 		test_accuracy = 0.5
 		interpolation_metric = Metric.RGB
 
+	"""
 	def test_1_0(self):
 		test_value = 1.0 
 		file_name = '1,0.png'
@@ -141,7 +167,7 @@ class TestSensingCl(TestSensingProperty):
 		test_value = 5.0 
 		file_name = '5,0.png'
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
-
+	"""
 
 class TestSensingCl_img(TestSensingProperty):
 
@@ -150,7 +176,7 @@ class TestSensingCl_img(TestSensingProperty):
 		global test_accuracy
 		global interpolation_metric
 		chemical_property = 'Cl_img' # currently testing Cl_img until a better picture is taken
-		test_accuracy = 0.2
+		test_accuracy = 0.25
 		interpolation_metric = Metric.SAT
 
 	def test_0_2(self):
