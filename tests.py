@@ -10,7 +10,9 @@ import unittest
 
 import init 
 from sensing_playground import interpolate_rgb_values
-from sensing import get_img, interpolate_chemical_property_from_img_rgb, visualize, get_average_rgb_from_img, get_scale_map, interpolate_chemical_property_from_img_hue
+from sensing import interpolate_chemical_property_from_img_rgb, interpolate_chemical_property_from_img_linear
+from sensing import get_average_rgb_from_img, get_img, visualize, get_scale_map
+from sensing import Metric
 from helpers import running_on_rpi
 
 # Global parameters
@@ -18,7 +20,7 @@ visualize_fails = False
 test_accuracy = None
 chemical_property = None
 # test a specific chemical
-test_chemical = None
+test_chemical = None 
 
 class TestTesting(unittest.TestCase):
 
@@ -50,7 +52,7 @@ class TestSensingPh(unittest.TestCase):
 
 		test_file = 'unit/' + chemical_property + '/' + image_file
 		img = get_img('file', test_file)
-		value = interpolate_chemical_property_from_img_hue(chemical_property, img)
+		value = interpolate_chemical_property_from_img_linear(chemical_property, img, Metric.HUE)
 
 		print("[TEST]: Testing %f = %f" % (value, test_value))
 
@@ -100,7 +102,7 @@ class TestSensingCl(unittest.TestCase):
 	def setUpClass():
 		global chemical_property 
 		global test_accuracy
-		chemical_property = 'Cl_img' # currently testing Cl_img until a better picture is taken
+		chemical_property = 'Cl'
 		test_accuracy = 0.5
 
 	def run_test(self, test_value, image_file):
@@ -148,6 +150,39 @@ class TestSensingCl(unittest.TestCase):
 		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
 
 
+class TestSensingCl_img(unittest.TestCase):
+
+	def setUpClass():
+		global chemical_property 
+		global test_accuracy
+		chemical_property = 'Cl_img' # currently testing Cl_img until a better picture is taken
+		test_accuracy = 0.2
+
+	def run_test(self, test_value, image_file):
+		global chemical_property 
+
+		test_file = 'unit/' + chemical_property + '/' + image_file
+		img = get_img('file', test_file)
+		value = interpolate_chemical_property_from_img_rgb(chemical_property, img)
+
+		print("[TEST]: Testing %f = %f" % (value, test_value))
+
+		try:
+			self.assertLess(abs(value - test_value), test_accuracy)
+		except Exception:
+			if visualize_fails:
+				r,g,b = get_average_rgb_from_img(img)
+				scale = get_scale_map(chemical_property)
+				visualize([r,g,b], scale)
+
+		return abs(value - test_value)
+
+	def test_0_2(self):
+		test_value = 0.2 
+		file_name = '0,2.png'
+		self.assertLess(self.run_test(test_value, file_name), test_accuracy)
+
+
 if __name__ == '__main__':
 	arg_vals = init.get_args()
 
@@ -157,5 +192,5 @@ if __name__ == '__main__':
 		unittest.main()
 	else:	
 		cl_test = unittest.TestSuite()
-		cl_test.addTest(TestSensingCl('test_1_0'))
+		cl_test.addTest(TestSensingCl_img('test_0_2'))
 		unittest.TextTestRunner().run(cl_test)

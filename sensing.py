@@ -18,6 +18,7 @@ import numpy as np
 from os import path
 import numpy.linalg as linalg
 import colorsys
+from enum import Enum
 
 import init
 from helpers import get_distance_between_points_3d, running_on_rpi
@@ -31,10 +32,22 @@ else:
     import pygame.camera
 
 
-def interpolate_chemical_property_from_img_hue(chemical, img):
+class Metric(Enum):
+	RED = 1
+	GREEN = 2
+	BLUE = 3
+	HUE = 4
+	SAT = 5
+	VAL = 6
+
+
+def interpolate_chemical_property_from_img_linear(chemical, img, interpolation_metric):
 	""" Interpolate the value of a chemical property using
-	linear interpolation from the scale and the hue of each image.
+	linear interpolation from the scale
 	"""
+
+	index = interpolation_metric.value
+	print(index)
 
 	r,g,b = get_average_rgb_from_img(img)
 	
@@ -43,24 +56,34 @@ def interpolate_chemical_property_from_img_hue(chemical, img):
 	# convert r,g,b to h,s,v 
 	h,s,v = colorsys.rgb_to_hsv(r,g,b)
 
+	# clean data for special metrics 
 	if h > 0.5:
 		h -= 1
+
+	# create array of all weights 
+	img_weights = [r,g,b,h,s,v]
 
 	# get the distance from each point in the scale (converted to a hue)
 	sorted_keys = sorted(scale.keys())
 	distances = []
-	hues = []
+	# store the actual value of the linearly interpolated value
+	scale_weights = []
 
 	for key in sorted_keys:
-		rgb = scale[key]
-		hue,sat,val = colorsys.rgb_to_hsv(*(rgb))
+		red,green,blue = scale[key]
+		hue,sat,val = colorsys.rgb_to_hsv(red,green,blue)
 
+		# subtract hue because it is a circle and pH (at least) is on outskirts
 		if hue > 0.5:
 			hue -= 1
 
-		dist = abs(h - hue)
+		# create array of weights
+		weights = [red,green,blue,hue,sat,val]
+
+		# calculate distance 
+		dist = abs(img_weights[index] - weights[index])
 		distances.append(dist)
-		hues.append(hue)
+		scale_weights.append(weights[index])
 
 	closest_index = distances.index(min(distances))
 
@@ -90,13 +113,20 @@ def interpolate_chemical_property_from_img_hue(chemical, img):
 			high_index = closest_index + 1
 
 	# interpolate the new value 
-	high_hue,_,_ = colorsys.rgb_to_hsv(*(scale[sorted_keys[high_index]]))
-	low_hue,_,_ = colorsys.rgb_to_hsv(*(scale[sorted_keys[low_index]]))
+	h_red,h_green,h_blue = scale[sorted_keys[high_index]]
+	h_hue,h_sat,h_val = colorsys.rgb_to_hsv(h_red,h_green,h_blue)
+	high_weights = [h_red,h_green,h_blue,h_hue,h_sat,h_val]
 
-	h_distance = high_hue - h
-	low_distance = high_hue - low_hue
+	l_red,l_green,l_blue = scale[sorted_keys[low_index]]
+	l_hue,l_sat,l_val = colorsys.rgb_to_hsv(l_red,l_green,l_blue)
+	low_weights = [l_red,l_green,l_blue,l_hue,l_sat,l_val]
 
-	ratio = h_distance / low_distance
+	print(high_weights,low_weights,img_weights)
+
+	high_distance = high_weights[index]- img_weights[index]
+	low_distance = high_weights[index] - low_weights[index]
+
+	ratio = high_distance / low_distance
 
 	# get the difference between high and low chemical property 
 	range_difference = float(sorted_keys[high_index]) - float(sorted_keys[low_index])
