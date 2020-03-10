@@ -121,8 +121,6 @@ def interpolate_chemical_property_from_img_linear(chemical, img, interpolation_m
 	l_hue,l_sat,l_val = colorsys.rgb_to_hsv(l_red,l_green,l_blue)
 	low_weights = [l_red,l_green,l_blue,l_hue,l_sat,l_val]
 
-	print(high_weights,low_weights,img_weights)
-
 	high_distance = high_weights[index]- img_weights[index]
 	low_distance = high_weights[index] - low_weights[index]
 
