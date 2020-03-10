@@ -39,7 +39,7 @@ class Metric(Enum):
 	HUE = 3
 	SAT = 4
 	VAL = 5
-
+	RGB = 6
 
 def interpolate_chemical_property_from_img_linear(chemical, img, interpolation_metric):
 	""" Interpolate the value of a chemical property using
