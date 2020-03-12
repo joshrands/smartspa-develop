@@ -120,7 +120,7 @@ class ServoMotor:
 
 		# setup pwm
 		self.pwm = GPIO.PWM(self.pin, frequency_hz)
-		self.pwm.start(default_frequency_hz)
+		self.pwm.start(self.default_frequency_hz)
 
 		log.info("Initialized ServoMotor at frequency %d for pin %d" % (frequency_hz, pin))
 
