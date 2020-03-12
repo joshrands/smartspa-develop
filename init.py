@@ -183,19 +183,26 @@ def init_hardware():
 	OPEN_MAIN_LINE_VALVE_PIN = hardware_config.data['open_main_line_valve_pin']
 	CLOSE_MAIN_LINE_VALVE_PIN = hardware_config.data['close_main_line_valve_pin']
 
-	# this will likely be 4 pins to drive a stepper 
+	# This will likely be a DC Motor Pin 
 	MIXING_PROP_MOTOR_PIN = hardware_config.data['mixing_prop_motor_pin']
+
+	DISPENSING_DOORS_SERVO_PIN = hardware_config.data['dispensing_doors_servo_pin']
 
 	# configure all rpi pins
 	if running_on_rpi():
+		# OUTPUT PINS 
 		hardware.add_pin("sensing_led", SENSING_LED_PIN, 'OUTPUT')
 		hardware.add_pin("spa_jets", SPA_JETS_PIN, 'OUTPUT')
 		hardware.add_pin("main_line_pump", MAIN_LINE_PUMP_PIN, 'OUTPUT')
 		hardware.add_pin("reagent_solenoid_valve", REAGENT_SOLENOID_VALVE_PIN, 'OUTPUT')
 		hardware.add_pin("ph_pump", PH_PERISTALTIC_PUMP_PIN, 'OUTPUT')
-		hardware.add_pin("mixing_prop_motor", MIXING_PROP_MOTOR_PIN, 'OUTPUT')
 		hardware.add_pin("open_main_line_valve", OPEN_MAIN_LINE_VALVE_PIN, 'OUTPUT')
 		hardware.add_pin("close_main_line_valve", CLOSE_MAIN_LINE_VALVE_PIN, 'OUTPUT')
+		# DC MOTOR PINS 
+		hardware.add_pin("mixing_prop_motor", MIXING_PROP_MOTOR_PIN, 'DCMOTOR')
+		# SERVO MOTOR PINS 
+		hardware.add_pin("dispensing_doors_servo", DISPENSING_DOORS_SERVO_PIN, 'SERVO')
+		
 
 	log.warning("Dispensing hardware init incomplete.")
 

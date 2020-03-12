@@ -1,3 +1,4 @@
 <system>
 	<spa_volume_gal>850</spa_volume_gal>
+	<visualize_rgb>False</visualize_rgb>
 </system>

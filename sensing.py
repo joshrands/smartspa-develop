@@ -18,6 +18,7 @@ import numpy as np
 from os import path
 import numpy.linalg as linalg
 import colorsys
+from enum import Enum
 
 import init
 from helpers import get_distance_between_points_3d, running_on_rpi
@@ -31,10 +32,24 @@ else:
     import pygame.camera
 
 
-def interpolate_chemical_property_from_img_hue(chemical, img):
-	""" Interpolate the value of a chemical property using
-	linear interpolation from the scale and the hue of each image.
+class Metric(Enum):
+	""" Enum for different metrics we can use to interpolate from.
 	"""
+	RED = 0
+	GREEN = 1
+	BLUE = 2
+	HUE = 3
+	SAT = 4
+	VAL = 5
+	RGB = 6
+	HSV = 7
+
+def interpolate_chemical_property_from_img_linear(chemical, img, interpolation_metric):
+	""" Interpolate the value of a chemical property using
+	linear interpolation from the scale
+	"""
+
+	index = interpolation_metric.value
 
 	r,g,b = get_average_rgb_from_img(img)
 	
@@ -43,24 +58,34 @@ def interpolate_chemical_property_from_img_hue(chemical, img):
 	# convert r,g,b to h,s,v 
 	h,s,v = colorsys.rgb_to_hsv(r,g,b)
 
+	# clean data for special metrics 
 	if h > 0.5:
 		h -= 1
+
+	# create array of all weights 
+	img_weights = [r,g,b,h,s,v]
 
 	# get the distance from each point in the scale (converted to a hue)
 	sorted_keys = sorted(scale.keys())
 	distances = []
-	hues = []
+	# store the actual value of the linearly interpolated value
+	scale_weights = []
 
 	for key in sorted_keys:
-		rgb = scale[key]
-		hue,sat,val = colorsys.rgb_to_hsv(*(rgb))
+		red,green,blue = scale[key]
+		hue,sat,val = colorsys.rgb_to_hsv(red,green,blue)
 
+		# subtract hue because it is a circle and pH (at least) is on outskirts
 		if hue > 0.5:
 			hue -= 1
 
-		dist = abs(h - hue)
+		# create array of weights
+		weights = [red,green,blue,hue,sat,val]
+
+		# calculate distance 
+		dist = abs(img_weights[index] - weights[index])
 		distances.append(dist)
-		hues.append(hue)
+		scale_weights.append(weights[index])
 
 	closest_index = distances.index(min(distances))
 
@@ -90,13 +115,18 @@ def interpolate_chemical_property_from_img_hue(chemical, img):
 			high_index = closest_index + 1
 
 	# interpolate the new value 
-	high_hue,_,_ = colorsys.rgb_to_hsv(*(scale[sorted_keys[high_index]]))
-	low_hue,_,_ = colorsys.rgb_to_hsv(*(scale[sorted_keys[low_index]]))
+	h_red,h_green,h_blue = scale[sorted_keys[high_index]]
+	h_hue,h_sat,h_val = colorsys.rgb_to_hsv(h_red,h_green,h_blue)
+	high_weights = [h_red,h_green,h_blue,h_hue,h_sat,h_val]
 
-	h_distance = high_hue - h
-	low_distance = high_hue - low_hue
+	l_red,l_green,l_blue = scale[sorted_keys[low_index]]
+	l_hue,l_sat,l_val = colorsys.rgb_to_hsv(l_red,l_green,l_blue)
+	low_weights = [l_red,l_green,l_blue,l_hue,l_sat,l_val]
 
-	ratio = h_distance / low_distance
+	high_distance = high_weights[index]- img_weights[index]
+	low_distance = high_weights[index] - low_weights[index]
+
+	ratio = high_distance / low_distance
 
 	# get the difference between high and low chemical property 
 	range_difference = float(sorted_keys[high_index]) - float(sorted_keys[low_index])
@@ -159,6 +189,8 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 			low_index = closest_index
 			high_index = closest_index + 1
 
+	log.info("High: %s, Low: %s" % (sorted_keys[high_index], sorted_keys[low_index]))
+
 	# interpolate the new value 
 	# 1. Derive the vector between low and high index 
 	high_rgb = scale[sorted_keys[high_index]]
@@ -179,44 +211,9 @@ def interpolate_chemical_property_from_img_rgb(chemical, img):
 	# get the difference between high and low chemical property 
 	range_difference = float(sorted_keys[high_index]) - float(sorted_keys[low_index])
 
-	interpolated_value = float(sorted_keys[high_index]) - range_difference * distance
+	interpolated_value = float(sorted_keys[low_index]) + range_difference * distance
 
 	return interpolated_value
-
-"""
-def get_error(chemical, vis=False):
-	DEPRECATED. DO NOT USE.
-	Get the error for a given chemical 
-
-	prepare_sample(chemical.lower())
-
-	source = init.sensing_config.data['image_source'] 
-	img = get_img(source)
-
-	if None == img:
-		log.error("Invalid image.")
-		return None
-
-	r,g,b = get_average_rgb_from_img(img)
-
-	scale = get_scale_map(chemical)
-
-	if vis:
-		visualize([r,g,b], scale)
-
-	# get the distance from each point in the scale 
-	closest = 255
-	closest_key = ""
-	for key in scale:
-		rgb = scale[key]
-		dist = get_distance_between_points_3d(rgb, [r,g,b])
-
-		if dist < closest:
-			closest = dist
-			closest_key = key
-
-	return dist
-"""
 
 
 def set_sample_led(light_on, LED_PIN):
@@ -288,11 +285,10 @@ def get_img(source, file_name=None):
 
 					# adjust resolution for easier data processing 
 					camera.resolution = (width, height)
-					# TODO: Double check bgr is okay or try rgb again...
 					camera.capture(stream, format='rgb') # was 'bgr'
-          # At this point the image is available as stream.array
+					# At this point the image is available as stream.array
 					img = stream.array
-          # save to file
+					# save to file
 					camera.capture('raw-sample.png')
 
 					# Turn off LED 
@@ -334,8 +330,15 @@ def get_average_rgb_from_img(img):
 	clean_r = r
 	clean_g = g
 	clean_b = b
+	iteration = 1
 	while outlier:
-    # look at data of image
+		# visualize rgb points 
+		if init.system_config.data['visualize_rgb'] == True:
+			# 3D Plot
+			plot_point_cloud([clean_r,clean_g,clean_b], ("Iteration " + str(iteration)))
+		iteration += 1
+
+    	# look at data of image
 		r_mean = np.mean(np.array(clean_r))
 		r_std = np.std(np.array(clean_r))
 		g_mean = np.mean(np.array(clean_g))
@@ -394,6 +397,21 @@ def get_scale_map(chemical):
 	in_file.close()
 
 	return scale
+
+
+def plot_point_cloud(points, title=None):
+	""" Visualize a 3d point cloud.
+	"""
+	fig = plt.figure()
+	ax = Axes3D(fig)
+
+	ax.scatter(points[0],points[1],points[2])
+	if title != None:
+		ax.set_title(title)
+
+	plt.savefig('./research/point_cloud.png') 
+	plt.show()
+	ax.clear()
 
 
 def visualize(rgb, scale):
